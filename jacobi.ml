@@ -4,7 +4,7 @@ open List;;
 open Printf;;
 
 
-(* Theorem 4.1.10 (A recurrence relation for constructing Jacobi-like polynomials
+(* Theorem 4.1.10 (A recurrence relation for constructing Jacobi-like polynomials)
 P_2(x) = 1/4(x-1)(x+1)
 P_3(x) = 1/2x(x-1)(x+1)
 n(n+2)P_(n+2)(x) = (n+1)(2n+1)xP_(n+1)(x) - n(n+1)P_n(x)
@@ -35,7 +35,7 @@ let e deg jacobi_list =
     let aux k pol_jac_kp1 =
         let p = (produit [{coeff=1./.k *. 1./.(sqrt (k*.(k+.1.)*.(2.*.k+.1.)) ); deg=0}] pol_jac_kp1) in
         function t -> evaluer p (2.*.t-.1.)
-    in iter2 aux (init (length jacobi_list) (function x -> float_of_int ((length jacobi_list) - x))) jacobi_list
+    in map2 aux (init (length jacobi_list) (function x -> float_of_int ((length jacobi_list) - x))) jacobi_list
 ;;
 
 (*
