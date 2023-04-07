@@ -25,7 +25,8 @@ let jacobi deg =
             match accu with
                 | [pm1; pm2; _] -> aux (n+.1.) ([produit ([{coeff=1./.(n*.(n+.2.)); deg=0}]) (somme (produit [{coeff=(n+.1.)*.(2.*.n+.1.); deg=1}] pm1) (produit [{coeff=n*.(n+.1.); deg=0}] pm2))] @ accu)
                 | _ -> accu
-    in aux 1. [[{coeff=0.5; deg=3}; {coeff=(-0.5); deg=1}]; [{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}]];;
+    in aux 1. [[{coeff=0.5; deg=3}; {coeff=(-0.5); deg=1}]; [{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}]]
+;;
 
 (* Theorem 4.1.0, expression for e_k
 e_k(t) = 1/k sqrt(k(k+1)(2k+1)) P_(k+1)(2t-1)
@@ -38,7 +39,8 @@ let e deg jacobi_list =
     in map2 aux (init (length jacobi_list) (function x -> float_of_int ((length jacobi_list) - x))) jacobi_list
 ;;
 
-(*
-print_float (evaluer (List.hd (jacobi 3.)) 4.)
-;;
-print_float (aux 2. (List.hd (jacobi 3.)) 4.);*)
+(*print_float (evaluer (List.hd (jacobi 3.)) 4.);;*)
+(*print_float (aux 2. (List.hd (jacobi 3.)) 4.);;*)
+(*print_float (List.hd (e 2. (jacobi 3.)) 4.);;*)
+let a = map (List.hd (e 2. (jacobi 3.))) (init 50000 (function x -> float_of_int (x+1)))
+let () = List.iter print_float a;;
