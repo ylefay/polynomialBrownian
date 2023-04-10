@@ -1,21 +1,18 @@
-open Polynomial;;
-open Float;;
-open List;;
-open Printf;;
+open Polynomial
+open Brownian
 
+open Float
+open List
+open Printf
 
-(* Theorem 4.1.10 (A recurrence relation for constructing Jacobi-like polynomials)
-P_2(x) = 1/4(x-1)(x+1)
-P_3(x) = 1/2x(x-1)(x+1)
-n(n+2)P_(n+2)(x) = (n+1)(2n+1)xP_(n+1)(x) - n(n+1)P_n(x)
+(*
+Jacobi-like polynomials & eigen functions
 *)
 
-(*let rec jacobi deg =
-    match deg with
-    | 2. -> [{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}]
-    | 3. -> [{coeff=0.5; deg=3}; {coeff=(-0.5); deg=1}]
-    | _ -> let n = deg -. 2. in  produit ([{coeff=1./.(n*.(n+.2.)); deg=0}]) (somme (produit [{coeff=(n+.1.)*.(2.*.n+.1.); deg=1}] (jacobi (n+.1.))) (produit [{coeff=n*.(n+.1.); deg=0}] (jacobi n)))
-;;*)
+(* Theorem 4.1.10 (A recurrence relation for constructing Jacobi-like polynomials)
+Assuming the product and the sum of two polynomials are done in O(1), we obtain
+the sequence of Jacobi polynomials of degree between 2 and n in O(n)
+*)
 
 let jacobi deg =
     let rec aux n accu =
@@ -29,18 +26,32 @@ let jacobi deg =
 ;;
 
 (* Theorem 4.1.0, expression for e_k
-e_k(t) = 1/k sqrt(k(k+1)(2k+1)) P_(k+1)(2t-1)
+O(n)
 *)
 
 let e deg jacobi_list =
     let aux k pol_jac_kp1 =
         let p = (produit [{coeff=1./.k *. 1./.(sqrt (k*.(k+.1.)*.(2.*.k+.1.)) ); deg=0}] pol_jac_kp1) in
-        function t -> evaluer p (2.*.t-.1.)
-    in map2 aux (init (length jacobi_list) (function x -> float_of_int ((length jacobi_list) - x))) jacobi_list
+        fun t -> evaluer p (2.*.t-.1.)
+    in map2 aux (init (length jacobi_list) (fun x -> float_of_int ((length jacobi_list) - x))) jacobi_list
 ;;
 
 (*print_float (evaluer (List.hd (jacobi 3.)) 4.);;*)
 (*print_float (aux 2. (List.hd (jacobi 3.)) 4.);;*)
 (*print_float (List.hd (e 2. (jacobi 3.)) 4.);;*)
-let a = map (List.hd (e 2. (jacobi 3.))) (init 50000 (function x -> float_of_int (x+1)))
-let () = List.iter print_float a;;
+(*let a = map (List.hd (e 2. (jacobi 3.))) (init 50000 (function x -> float_of_int (x+1)))
+let () = List.iter print_float a;;*)
+
+let basis deg eigen_list n =
+    let dt = 1. /. float_of_int n in
+    let grid = init n (function x -> float n +. dt) in
+    let path = bm_paths 0. 1. 1. n 1 in
+    let w1 = hd (rev path) in
+    let path = hd path in
+    let first_term = map2 (fun x y -> x -. w1 *. y) path grid in
+    let second_term = map2 (fun x y -> y *. dt *. 1. /. (x *. (x -. 1))) grid first_term in
+    let rec fun_list_integrands _eigen_list = match _eigen_list with
+        | eigen_fun, tl -> (map2 (fun x y -> x *. y) (map eigen_fun grid) second_term) @ (fun_list_integrands tl)
+    in let list_integrands = fun_list_integrands eigen_list
+    in map (fun l -> (fold_left (fun x y -> x +. y) 0. l)) list_integrands
+;;
