@@ -44,7 +44,7 @@ let () = List.iter print_float a;;*)
 
 let basis deg eigen_list n =
     let dt = 1. /. float_of_int n in
-    let grid = init n (function x -> float n +. dt) in
+    let grid = init n (((+) dt))
     let path = bm_paths 0. 1. 1. n 1 in
     let w1 = hd (rev path) in
     let path = hd path in
