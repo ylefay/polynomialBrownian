@@ -50,8 +50,7 @@ let basis deg eigen_list n =
     let path = hd path in
     let first_term = map2 (fun x y -> x -. w1 *. y) path grid in
     let second_term = map2 (fun x y -> y *. dt *. 1. /. (x *. (x -. 1))) grid first_term in
-    let rec fun_list_integrands _eigen_list = match _eigen_list with
-        | eigen_fun, tl -> (map2 (fun x y -> x *. y) (map eigen_fun grid) second_term) @ (fun_list_integrands tl)
-    in let list_integrands = fun_list_integrands eigen_list
+    let list_integrands = map (fun eigen_fun -> (map2 (fun x y -> x *. y) (map eigen_fun grid) second_term)) eigen_list in
+    let list_integrands = fun_list_integrands eigen_list
     in map (fun l -> (fold_left (fun x y -> x +. y) 0. l)) list_integrands
 ;;
