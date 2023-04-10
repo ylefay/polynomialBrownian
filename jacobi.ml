@@ -1,6 +1,5 @@
 open Polynomial
 open Brownian
-
 open Float
 open List
 open Printf
@@ -29,7 +28,7 @@ let jacobi deg =
 O(n)
 *)
 
-let e deg jacobi_list =
+let eigen deg jacobi_list =
     let aux k pol_jac_kp1 =
         let p = (produit [{coeff=1./.k *. 1./.(sqrt (k*.(k+.1.)*.(2.*.k+.1.)) ); deg=0}] pol_jac_kp1) in
         fun t -> evaluer p (2.*.t-.1.)
@@ -42,15 +41,29 @@ let e deg jacobi_list =
 (*let a = map (List.hd (e 2. (jacobi 3.))) (init 50000 (function x -> float_of_int (x+1)))
 let () = List.iter print_float a;;*)
 
-let basis deg eigen_list n =
+(*let paths = bm_paths 0. 1. 1. 1000 1;;
+map (fun path -> List.iter print_float path) paths;;*)
+
+let basis deg n eigen_list =
     let dt = 1. /. float_of_int n in
-    (*let grid = init n (fun x -> float_of_int x +. dt) in*)
-    let path = bm_paths 0. 1. 1. n 1 in
-    (*let w1 = hd (rev path) in*)
-    let path = hd path in
+    let rec aux_grid start step stop =
+        let j = start+.step in
+        if j < stop then
+            j :: aux_grid j step stop
+        else
+            []
+    in let grid = aux_grid 0. dt 1. in
+    let path = bm_paths 0. 1. 1. n 1 |> hd in
+    let w1 = path |> rev |> hd in
     let first_term = map2 (fun x y -> x -. w1 *. y) path grid in
-    let second_term = map2 (fun x y -> y *. dt *. 1. /. (x *. (x -. 1))) grid first_term in
+    let second_term = map2 (fun x y -> y *. dt *. 1. /. (x *. (x -. 1.))) grid first_term in
     let list_integrands = map (fun eigen_fun -> (map2 (fun x y -> x *. y) (map eigen_fun grid) second_term)) eigen_list in
-    let list_integrands = fun_list_integrands eigen_list
-    in map (fun l -> (fold_left (fun x y -> x +. y) 0. l)) list_integrands
+    map (fun l -> (fold_left (fun x y -> x +. y) 0. l)) list_integrands
 ;;
+
+
+jacobi 3.
+|> eigen 2.
+|> basis 2. 100
+|> List.iter print_float
+
