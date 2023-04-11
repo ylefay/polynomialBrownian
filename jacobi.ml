@@ -19,7 +19,7 @@ let jacobi deg =
             accu
         else
             match accu with
-                | [pm1; pm2; _] -> aux (n+.1.) ([produit ([{coeff=1./.(n*.(n+.2.)); deg=0}]) (somme (produit [{coeff=(n+.1.)*.(2.*.n+.1.); deg=1}] pm1) (produit [{coeff=n*.(n+.1.); deg=0}] pm2))] @ accu)
+                | pm1::pm2::_ -> aux (n+.1.) ([produit ([{coeff=1./.(n*.(n+.2.)); deg=0}]) (somme (produit [{coeff=(n+.1.)*.(2.*.n+.1.); deg=1}] pm1) (produit [{coeff=n*.(n+.1.); deg=0}] pm2))] @ accu)
                 | _ -> accu
     in aux 1. [[{coeff=0.5; deg=3}; {coeff=(-0.5); deg=1}]; [{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}]]
 ;;
@@ -46,24 +46,30 @@ map (fun path -> List.iter print_float path) paths;;*)
 
 let basis deg n eigen_list =
     let dt = 1. /. float_of_int n in
-    let rec aux_grid start step stop =
-        let j = start+.step in
-        if j < stop then
-            j :: aux_grid j step stop
-        else
-            []
-    in let grid = aux_grid 0. dt 1. in
+    let grid = range 0. dt 1. n in
     let path = bm_paths 0. 1. 1. n 1 |> hd in
     let w1 = path |> rev |> hd in
     let first_term = map2 (fun x y -> x -. w1 *. y) path grid in
-    let second_term = map2 (fun x y -> y *. dt *. 1. /. (x *. (x -. 1.))) grid first_term in
+    let aux x y =
+        if x<> 0. && x<>1. then
+            y *. dt *. 1. /. (x *. (x -. 1.))
+        else 0.
+    in
+    let second_term = map2 aux grid first_term in
     let list_integrands = map (fun eigen_fun -> (map2 (fun x y -> x *. y) (map eigen_fun grid) second_term)) eigen_list in
-    map (fun l -> (fold_left (fun x y -> x +. y) 0. l)) list_integrands
+    map sum list_integrands
 ;;
-
+(*
+let test () =
+    let n = 50000 in
+    let dt = 1. /. float_of_int n in
+    let grid = range 0. dt 1. n in
+    let path = bm_paths 0. 1. 1. n 1 |> hd in
+    let w1 = path |> rev |> hd in
+    length grid |> print_int;;*)
 
 jacobi 3.
 |> eigen 2.
-|> basis 2. 100
-|> List.iter print_float
-
+|> basis 2. 5000
+|> iter print_float
+;;

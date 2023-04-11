@@ -8,6 +8,15 @@ let c_sum l =
     | hd::tl -> let tmp_sum = pre+.hd in sum tmp_sum (tmp_sum::acc) tl
   in rev (sum 0. [] l)
 
+let sum l = fold_left (fun x y -> x +. y) 0. l
+
+let range start step stop nn =
+    let rec aux j step stop n =
+            if j < stop && n < nn then
+                j :: aux (j+.step) step stop (n+1)
+            else
+                []
+    in aux start step stop 0
 (*
 Box-Muller method
 *)
