@@ -1,22 +1,20 @@
-let pi = 3.14159265358979312
+let pi = Float.pi
 open Random
 open List
 
 let c_sum l =
   let rec sum pre acc = function
-    | [] -> acc
+    | [] -> rev acc
     | hd::tl -> let tmp_sum = pre+.hd in sum tmp_sum (tmp_sum::acc) tl
-  in rev (sum 0. [] l)
+  in sum 0. [] l
 
 let sum l = fold_left (fun x y -> x +. y) 0. l
 
 let range start step stop nn =
-    let rec aux j step stop n =
-            if j < stop && n < nn then
-                j :: aux (j+.step) step stop (n+1)
-            else
-                []
-    in aux start step stop 0
+    let rec aux j n =
+            if j < stop && n < nn then j :: aux (j+.step) (n+1) else []
+    in aux start 0;;
+
 (*
 Box-Muller method
 *)

@@ -51,25 +51,20 @@ let basis deg n eigen_list =
     let w1 = path |> rev |> hd in
     let first_term = map2 (fun x y -> x -. w1 *. y) path grid in
     let aux x y =
-        if x<> 0. && x<>1. then
-            y *. dt *. 1. /. (x *. (x -. 1.))
-        else 0.
+        match x with
+        | 0. | 1. -> 0.
+        | _ -> y *. dt *. 1. /. (x *. (x -. 1.))
     in
     let second_term = map2 aux grid first_term in
-    let list_integrands = map (fun eigen_fun -> (map2 (fun x y -> x *. y) (map eigen_fun grid) second_term)) eigen_list in
-    map sum list_integrands
+    List.map (fun eigen_fun -> List.map2 (fun x y -> x *. y) (List.map eigen_fun grid) second_term |> List.fold_left (+.) 0.0) eigen_list
 ;;
-(*
-let test () =
-    let n = 50000 in
-    let dt = 1. /. float_of_int n in
-    let grid = range 0. dt 1. n in
-    let path = bm_paths 0. 1. 1. n 1 |> hd in
-    let w1 = path |> rev |> hd in
-    length grid |> print_int;;*)
 
-jacobi 3.
-|> eigen 2.
-|> basis 2. 5000
-|> iter print_float
+let compute_basis deg n =
+    let fdeg = float_of_int deg in
+    jacobi (fdeg+.1.)
+    |> eigen fdeg
+    |> basis fdeg n
+    |> iter print_float
 ;;
+
+compute_basis 5 5000;;
