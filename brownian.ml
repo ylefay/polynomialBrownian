@@ -1,14 +1,13 @@
 let pi = Float.pi
-open Random
 open List
+
+let _ = Random.self_init()
 
 let c_sum l =
   let rec sum pre acc = function
     | [] -> rev acc
     | hd::tl -> let tmp_sum = pre+.hd in sum tmp_sum (tmp_sum::acc) tl
   in sum 0. [] l
-
-let sum l = fold_left (fun x y -> x +. y) 0. l
 
 let range start step stop nn =
     let rec aux j n =
@@ -18,7 +17,8 @@ let range start step stop nn =
 (*
 Box-Muller method
 *)
-let normal_gen mu sigma = let u = sqrt (-2. *. log (Random.float 1.)) *. cos (2. *. pi *. Random.float 1.)
+let normal_gen mu sigma =
+    let u = sqrt (-2. *. log (Random.float 1.)) *. cos (2. *. pi *. Random.float 1.)
     in mu +. sigma *. u;;
 
 let dW_gen n dt =

@@ -1,6 +1,6 @@
 type monome = {coeff: float; deg: int};;
 type polynome = monome list;;
-
+open Printf
 let rec somme p1 p2 =
   match p1, p2 with
   | [], _ -> p2
@@ -14,9 +14,9 @@ let rec somme p1 p2 =
 let rec produit p1 p2 =
     match p1, p2 with
     | [], _ | _, [] -> []
-    | ({coeff=c1; deg=n})::p1p, p2p ->
+    | ({coeff=c1; deg=n})::p1p, p2 ->
         (List.map (fun {coeff=c2; deg=m} -> {coeff=c1*.c2; deg=m+n}) p2)
-        |> somme (produit p1p p2p)
+        |> somme (produit p1p p2)
 
 let rec puissance x n =
     if n = 0 then 1. else x *. puissance x (n-1)
@@ -27,3 +27,16 @@ let rec evaluer p x =
     | {deg=n; coeff=c}::pp -> (c *. puissance x n ) +. evaluer pp x
 ;;
 
+let afficher_monome {coeff=c ; deg=d} =
+  if c > 0. then printf "+" ;
+  printf "%fX^%d" c d
+;;
+
+let afficher p = match p with
+| [] -> printf "0" (* un cas particulier, quand même *)
+| _  -> List.iter afficher_monome p
+;;
+
+(* Afficher avec retour à la ligne *)
+let afficher_bis p = afficher p ; print_newline ()
+;;
