@@ -23,4 +23,7 @@ $$y_t = e^{-ah+\sigma W_{s,t}}(y_s+ab\int_s^t e^{a(u-s)-\sigma W_{s,u}}\mathrm{d
 
 The Parabola-ODE method gives
 
-$$Y_0 := y_0, Y_{k+1} = e^{-ah+\sigma W_{s,t}}(y_s+ab\int_{t_k}^{t_{k+1}} e^{a(s-t_k)-\sigma \tilde{W}_{t_k,s}}\mathrm{d}s)$$
+\begin{align}
+Y_0 &:= y_0\\
+Y_{k+1} &= e^{-ah+\sigma W_{s,t}}(y_s+ab\int_{t_k}^{t_{k+1}} e^{a(s-t_k)-\sigma \tilde{W}_{t_k,s}}\mathrm{d}s)
+\end{align}
