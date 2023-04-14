@@ -5,14 +5,13 @@ open List
 open Printf
 
 (*
-Jacobi-like polynomials & eigen functions
+Numerical approximations for stochastic differential equations, Foster
 *)
 
 (* Theorem 4.1.10 (A recurrence relation for constructing Jacobi-like polynomials)
 Assuming the product and the sum of two polynomials are done in O(1), we obtain
 the sequence of Jacobi polynomials of degree between 2 and n in O(n)
 *)
-
 let jacobi deg =
     let rec aux n accu =
         if n >= deg -.1. then
@@ -40,14 +39,9 @@ let eigen deg jacobi_list =
 
 let pprint x = print_float x; print_string ",";;
 
-(*print_float (evaluer (List.hd (jacobi 3.)) 4.);;*)
-(*print_float (aux 2. (List.hd (jacobi 3.)) 4.);;*)
-(*print_float (List.hd (e 2. (jacobi 3.)) 4.);;*)
-(*let a = map (List.hd (e 2. (jacobi 3.))) (init 50000 (function x -> float_of_int (x+1)))
-let () = List.iter print_float a;;*)
-
 (*let paths = bm_paths 0. 1. 1. 1000 1;;
 map (fun path -> List.iter print_float path) paths;;*)
+
 
 let basis deg n path eigen_list =
     let dt = 1. /. float_of_int n in
@@ -63,7 +57,13 @@ let basis deg n path eigen_list =
     List.map (fun eigen_fun -> List.map2 (fun x y -> x *. y) (List.map eigen_fun grid) second_term |> fold_left (+.) 0.0) eigen_list
 ;;
 
+(*
+A Polynomial based Karhunen-Loève theorem
+See proof of theorem 4.1.6
 
+I_1, ..., I_deg s.t
+W = W_1*t+I_1 e_1(t)+...
+*)
 let compute_basis deg n =
     let fdeg = float_of_int deg in
     let path = bm_paths 0. 1. 1. n 1 |> hd in
@@ -74,11 +74,20 @@ let compute_basis deg n =
     |> iter pprint
 ;;
 
+let parabola_brownian n path =
+    let w1 = path |> rev |> hd in
+    let eigen_func = jacobi 2. |> eigen 1. in
+    let i1 = eigen_func |> basis 1. n path |> hd in
+    let e1 = eigen_func |> hd in
+    fun t -> (w1*.t +. i1*.(e1 t));;
+    (*Wpara(t) = W_1t + I_2sqrt(6)t(t-1) *)
 
 (*let path = bm_paths 0. 1. 1. 50 1 |> hd |> iter pprint
     ;;*)
 (*map (fun f -> f 0.75) (eigen 1. (jacobi 2.)) |> iter pprint;;*)
-compute_basis 2 500;;
+(*
+compute_basis 2 500;;*)
+parabola_brownian 500 (bm_paths 0. 1. 1. 500 1 |> hd) 5.;;
 (*let evalp t f = evaluer f t |> pprint;;*)
 (*
 (jacobi 4.) |> iter (evalp 10.);;
