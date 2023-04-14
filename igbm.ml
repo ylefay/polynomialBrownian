@@ -30,4 +30,5 @@ let parabola_igbm a b sigma y0 t_max n_t n_int =
             rev accu
     in aux 1 parabolas paths [y0]
     ;;
+
 parabola_igbm 0.1 0.04 0.6 0.06 5. 200 10000 |> iter pprint;;

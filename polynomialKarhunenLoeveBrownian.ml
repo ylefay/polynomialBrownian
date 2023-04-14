@@ -67,7 +67,7 @@ W = W_1*t+I_1 e_1(t)+...
 let compute_basis deg n =
     let fdeg = float_of_int deg in
     let path = bm_paths 0. 1. 1. n 1 |> hd in
-    iter pprint path;
+    iter pprint path; print_string "BASIS:";
     jacobi (fdeg+.1.)
     |> eigen fdeg
     |> basis fdeg n path
@@ -85,9 +85,10 @@ let parabola_brownian n path =
 (*let path = bm_paths 0. 1. 1. 50 1 |> hd |> iter pprint
     ;;*)
 (*map (fun f -> f 0.75) (eigen 1. (jacobi 2.)) |> iter pprint;;*)
-(*
-compute_basis 2 500;;*)
-parabola_brownian 500 (bm_paths 0. 1. 1. 500 1 |> hd) 5.;;
+
+compute_basis 10 500;;
+
+(*parabola_brownian 500 (bm_paths 0. 1. 1. 500 1 |> hd) 5.;;*)
 (*let evalp t f = evaluer f t |> pprint;;*)
 (*
 (jacobi 4.) |> iter (evalp 10.);;
