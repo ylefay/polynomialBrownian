@@ -10,7 +10,7 @@ $$I_k = \int_0^1 (W_t-W_1e_0(t))\frac{e_k(t)}{t(1-t)}\mathrm{d}t$$
 where $e_k(t) = 1/k \sqrt{k(k+1)(2k+1)}P_{k+1}(2t-1)$.
 
 For each $n\geq 2$, we have
-$$n(n+2)P_{n+2}(x) = (n+1)(2n+1)xP_{n+1}(x)-n(n+1)P_n(x)$$
+$$k(k+2)P_{k+2}(X) = (k+1)(2k+1)XP_{k+1}(X)-k(k+1)P_k(X)$$
 
 # Inhomogeneous Geometric Brownian Motion
 Consider the following Stratonovich SDE:
@@ -24,6 +24,8 @@ $$y_t = e^{-ah+\sigma W_{s,t}}(y_s+ab\int_s^t e^{a(u-s)-\sigma W_{s,u}}\mathrm{d
 The Parabola-ODE method gives
 
 $$
-Y_0 := y_0\\
+Y_0 := y_0$$
+
+$$
 Y_{k+1} = e^{-ah+\sigma W_{s,t}}(y_s+ab\int_{t_k}^{t_{k+1}} e^{a(s-t_k)-\sigma \tilde{W}_{t_k,s}}\mathrm{d}s)
 $$
