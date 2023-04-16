@@ -85,11 +85,9 @@ let parabola_brownian n path =
 (*let path = bm_paths 0. 1. 1. 50 1 |> hd |> iter pprint
     ;;*)
 (*map (fun f -> f 0.75) (eigen 1. (jacobi 2.)) |> iter pprint;;*)
-
-compute_basis 10 500;;
+(*
+compute_basis 10 500;;*)
 
 (*parabola_brownian 500 (bm_paths 0. 1. 1. 500 1 |> hd) 5.;;*)
-(*let evalp t f = evaluer f t |> pprint;;*)
-(*
-(jacobi 4.) |> iter (evalp 10.);;
-*)
+let evalp t f = evaluer f t |> pprint;;
+(jacobi 4.) |> iter (evalp 2.);;

@@ -16,15 +16,15 @@ let parabola_igbm a b sigma y0 t_max n_t n_int =
     let h = t_max /. float_of_int n_t in
     let ds = h /. float_of_int n_int in
     let grid = range 0. ds h n_int in
-    let paths = bm_paths 0. 1. h n_int n_t (*((W_s)_{s\in[kh, k(h+1)]})_{k<=n_int}*) in
+    let paths = bm_paths 0. 1. 1. n_int n_t (*((W_s)_{s\in[0,1]})_{k<=n_int}, will be rescaled*) in
     let parabolas = map (parabola_brownian n_int) paths in
     let rec aux k parabolas paths accu =
         if k <= n_t then
             match accu,paths,parabolas with
                 | yk::_,path::q_paths,parabola::q_parabolas ->
                     let w1 = path |> rev |> hd in
-                    let integrands = map (fun s -> exp (tildea*.s-.sigma*.(parabola s)) *. ds) grid in
-                    let ykp1 = exp (-1.*.tildea*.h+.sigma*.w1)*.(yk+.a*.b*.(fold_left (+.) 0.0 integrands)) in
+                    let integrands = map (fun s -> exp (tildea*.s-.sigma*.(sqrt h)*.(parabola s)) *. ds) grid in
+                    let ykp1 = exp (-1.*.tildea*.h+.(sqrt h)*.sigma*.w1)*.(yk+.a*.b*.(fold_left (+.) 0.0 integrands)) in
                 aux (k+1) q_parabolas q_paths ([ykp1]@accu)
         else
             rev accu

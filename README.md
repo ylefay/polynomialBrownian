@@ -27,5 +27,5 @@ $$
 Y_0 := y_0$$
 
 $$
-Y_{k+1} = e^{-ah+\sigma W_{s,t}}(y_s+ab\int_{t_k}^{t_{k+1}} e^{a(s-t_k)-\sigma \tilde{W}_{t_k,s}}\mathrm{d}s)
+Y_{k+1} = e^{-ah+\sigma W_{s,t}}(Y_k+ab\int_{t_k}^{t_{k+1}} e^{a(u-t_k)-\sigma \tilde{W}_{t_k,u}}\mathrm{d}u)
 $$
