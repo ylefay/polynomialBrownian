@@ -90,4 +90,3 @@ compute_basis 10 500;;*)
 
 (*parabola_brownian 500 (bm_paths 0. 1. 1. 500 1 |> hd) 5.;;*)
 let evalp t f = evaluer f t |> pprint;;
-(jacobi 4.) |> iter (evalp 2.);;
