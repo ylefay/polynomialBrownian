@@ -31,6 +31,7 @@ Y_{k+1} = e^{-ah+\sigma W_{s,t}}(Y_k+ab\int_{t_k}^{t_{k+1}} e^{a(u-t_k)-\sigma \
 $$
 
 # Compilation and profiling
+Please see `http://ocamlverse.net/content/optimizing_performance.html`
 ```
 ocamlopt -g ./polynomial.ml ./brownian.ml ./polynomialKarhunenLoeveBrownian.ml ./igbm.ml 
 perf record --call-graph=dwarf -- ./a.out

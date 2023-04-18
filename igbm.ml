@@ -20,10 +20,10 @@ let parabola_igbm a b sigma y0 t_max n_t n_int =
     let rec aux k accu =
         if k <= n_t then
             let path = bm_paths 0. 1. 1. n_int 1 (*(W_s)_{s\in[0,1]} will be rescaled*) in
+            let w1 = path |> hd |> rev |> hd in
             let parabola = map (parabola_brownian n_int) path |> hd in
             match accu with
                 | yk::_->
-                    let w1 = path |> hd |> rev |> hd in
                     let integrands = map (fun s -> exp (tildea*.s*.h-.sigma*.sqrth*.(parabola s)) *. ds) grid in
                     let ykp1 = exp (-1.*.tildea*.h+.sqrth *.sigma*.w1)*.(yk+.a*.b*.(fold_left (+.) 0.0 integrands)) in
                 aux (k+1) ([ykp1]@accu)

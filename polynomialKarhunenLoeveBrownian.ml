@@ -4,6 +4,8 @@ open Float
 open List
 open Printf
 
+let sqrt6 = 2.44948974278;;
+
 (*
 Numerical approximations for stochastic differential equations, Foster
 *)
@@ -45,16 +47,14 @@ map (fun path -> List.iter print_float path) paths;;*)
 
 let basis deg n path eigen_list =
     let dt = 1. /. float_of_int n in
-    let grid = range 0. dt 1. n in
     let w1 = path |> rev |> hd in
-    let first_term = map2 (fun x y -> x -. w1 *. y) path grid in
-    let aux x y =
-        match x with
+    let grid = range 0. dt 1. n in
+    let first_term = map2 (fun x t ->
+    match t with
         | 0. | 1. -> 0.
-        | _ -> y *. dt *. 1. /. (x *. (x -. 1.))
-    in
-    let second_term = map2 aux grid first_term in
-    List.map (fun eigen_fun -> List.map2 (fun x y -> x *. y) (List.map eigen_fun grid) second_term |> fold_left (+.) 0.0) eigen_list
+        | _ -> (x -. w1 *. t) *. dt *. 1. /. (t *. (t -. 1.)))
+     path grid in
+    List.map (fun eigen_fun -> map2 (fun x y -> x *. y) (map eigen_fun grid) first_term |> fold_left (+.) 0.0) eigen_list
 ;;
 
 (*
@@ -79,8 +79,8 @@ let parabola_brownian n path =
     let eigen_func = jacobi 2. |> eigen 1. in
     let i1 = eigen_func |> basis 1. n path |> hd in
     let e1 = eigen_func |> hd in
-    fun t -> (w1*.t +. i1*.(e1 t));;
-    (*Wpara(t) = W_1t + I_2sqrt(6)t(t-1) *)
+    (*fun t -> (w1*.t +. i1*.(e1 t));;*)  (*Wpara(t) = W_1t + I_2sqrt(6)t(t-1) *)
+    fun t -> w1*.t +. i1*.sqrt6*.t*.(t-.1.)
 
 (*let path = bm_paths 0. 1. 1. 50 1 |> hd |> iter pprint
     ;;*)
