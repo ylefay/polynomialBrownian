@@ -1,6 +1,7 @@
 type monome = {coeff: float; deg: int};;
 type polynome = monome list;;
 open Printf
+
 let rec somme p1 p2 =
   match p1, p2 with
   | [], _ -> p2
@@ -18,14 +19,21 @@ let rec produit p1 p2 =
         (List.map (fun {coeff=c2; deg=m} -> {coeff=c1*.c2; deg=m+n}) p2)
         |> somme (produit p1p p2)
 
-let rec puissance x n =
-    if n = 0 then 1. else x *. puissance x (n-1)
+(*
+Faster than built-in exponentiation
+*)
+let rec puissance_opti_square x n = match n with
+    | 0 -> 1.
+    | 1 -> x
+    | n -> let b = puissance_opti_square x (n / 2) in b*.b*. (if n mod 2 = 0 then 1. else x)
+
 
 let rec evaluer p x =
     match p with
     | [] -> 0.
-    | {deg=n; coeff=c}::pp -> (c *. puissance x n ) +. evaluer pp x
+    | {deg=n; coeff=c}::pp -> (c *. puissance_opti_square x n ) +. evaluer pp x
 ;;
+
 
 let afficher_monome {coeff=c ; deg=d} =
   if c > 0. then printf "+" ;

@@ -29,3 +29,10 @@ Y_0 := y_0$$
 $$
 Y_{k+1} = e^{-ah+\sigma W_{s,t}}(Y_k+ab\int_{t_k}^{t_{k+1}} e^{a(u-t_k)-\sigma \tilde{W}_{t_k,u}}\mathrm{d}u)
 $$
+
+# Compilation and profiling
+```
+ocamlopt -g ./polynomial.ml ./brownian.ml ./polynomialKarhunenLoeveBrownian.ml ./igbm.ml 
+perf record --call-graph=dwarf -- ./a.out
+perf report
+```

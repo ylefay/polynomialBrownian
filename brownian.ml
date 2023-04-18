@@ -22,10 +22,20 @@ let normal_gen mu sigma =
     in mu +. sigma *. u;;
 
 (*
+Faster but imprecise
+Rao et al.
+*)
+let normal_gen_2 mu sigma =
+    let u = Random.float 1. in
+    let z = -. log (1. /. u -. 1.) /. 1.702 in
+    mu +. sigma *. z
+
+
+(*
 Generate normal increments
 *)
 let dW_gen n dt =
-  let dW () = normal_gen 0. (sqrt dt) in
+  let dW () = normal_gen_2 0. (sqrt dt) in
   fun () -> init n (fun _ -> dW ())
 
 (*
