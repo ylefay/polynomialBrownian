@@ -41,11 +41,11 @@ let log_ode_igbm a b sigma y0 t_max n_t n_int =
     let tildea = a+.0.5*.sigma*.sigma in
     let h = t_max /. float_of_int n_t in
     let sqrth = sqrt h in
+    let eigen_func = jacobi 2. |> eigen 1. in
     let rec aux k accu =
         if k <= n_t then
             let path = bm_paths_bis 0. 1. 1. n_int 1 |> hd (*(W_s)_{s\in[0,1]} will be rescaled*) in
             let w1 = path |> rev |> hd in
-            let eigen_func = jacobi 2. |> eigen 1. in
             let i1 = eigen_func |> basis 1. n_int path |> hd in
             let space_time_levy_area = oversqrt6 *. i1 in
             match accu with
