@@ -3,6 +3,9 @@ open List
 
 let _ = Random.self_init()
 
+(*
+cumulative sum function
+*)
 let c_sum l =
   let rec sum pre acc = function
     | [] -> rev acc
@@ -48,4 +51,19 @@ let bm_paths x0 sigma t n m =
         generate ()
         |> c_sum
         |> map (fun bm -> x0 +. sigma *. bm)
-    )
+    );;
+
+(*slower
+let bm_paths_bis x0 sigma t n m =
+  let dx = sigma*.(t/.(float_of_int n) |> sqrt) in
+  let rec loop i x =
+    if i = n then []
+    else
+      let x' = x +. dx *. (normal_gen_2 0.0 1.0) in
+      x' :: loop (i+1) x'
+  in
+  init m (fun _ -> loop 0 x0);;
+*)
+
+
+let bm_paths_bis = bm_paths;;
