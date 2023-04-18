@@ -30,6 +30,16 @@ $$
 Y_{k+1} = e^{-ah+\sigma W_{s,t}}(Y_k+ab\int_{t_k}^{t_{k+1}} e^{a(u-t_k)-\sigma \tilde{W}_{t_k,u}}\mathrm{d}u)
 $$
 
+The Log-ODE metohd gives
+
+$$
+Y_0 := y_0$$
+
+$$
+Y_{k+1} = Y_k e^{-\tilde{a}h + \sigma W_{t_k,t_{k+1}}} + abh\bigg(1-\sigma H_{t_k,t_{k+1}}+\sigma^2\bigg(3/5h H_{t_k,t_{k+1}}^2+1/30h\bigg)\bigg)\frac{e^{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}}-1}{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}}
+$$
+
+where $$H_{t_k,t_{k+1}} = \frac{I_1}{\sqrt{6}}$$
 # Compilation and profiling
 Please see `http://ocamlverse.net/content/optimizing_performance.html`
 ```
