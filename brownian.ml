@@ -1,7 +1,11 @@
 let pi = Float.pi
 open List
 
-let _ = Random.self_init()
+(* random seed *)
+let _ = Random.self_init();;
+(* fix seed *)
+(*let _ = Random.init 1;;*)
+
 
 (*
 cumulative sum function
@@ -41,7 +45,7 @@ let normal_gen_2 mu sigma =
 Generate normal increments
 *)
 let dW_gen n dt =
-  let dW () = normal_gen 0. (sqrt dt) in
+  let dW () = normal_gen_2 0. (sqrt dt) in
   fun () -> init n (fun _ -> dW ())
 
 (*
@@ -56,17 +60,22 @@ let bm_paths x0 sigma t n m =
         |> map (fun bm -> x0 +. sigma *. bm)
     );;
 
-(*slower
-let bm_paths_bis x0 sigma t n m =
-  let dx = sigma*.(t/.(float_of_int n) |> sqrt) in
-  let rec loop i x =
-    if i = n then []
-    else
-      let x' = x +. dx *. (normal_gen_2 0.0 1.0) in
-      x' :: loop (i+1) x'
-  in
-  init m (fun _ -> loop 0 x0);;
+(*
+split list in multiple subarrays
 *)
+let split_f list n =
+    let l = length list / n in
+    let rec aux accu accu2 j =
+        if j < l then
+            match accu2 with
+                | x::q -> match accu with
+                    | y::qp -> aux ([y@[x]]@qp) q (j+1)
+                    | _ -> aux [[x]] q (j+1)
+                | [] -> rev accu
+        else
+            match accu2 with
+                | x::q -> aux ([[x]]@accu) q 1
+                | _ -> rev accu
+    in aux [[]] list 0;;
 
-
-let bm_paths_bis = bm_paths;;
+split_f [3;2;1] 3;;

@@ -1,10 +1,7 @@
 open Polynomial
 open Brownian
-open Float
 open List
-open Printf
 
-let sqrt6 = 2.44948974278;;
 
 (*
 Numerical approximations for stochastic differential equations, Foster
@@ -46,14 +43,13 @@ map (fun path -> List.iter print_float path) paths;;*)
 
 
 let basis deg n path eigen_list =
-    let dt = 1. /. float_of_int n in
-    let w1 = path |> rev |> hd in
+    let dt = 1. /. float_of_int n and w1 = path |> rev |> hd in
     let grid = range 0. dt 1. n in
-    let first_term = map2 (fun x t ->
+    let first_term = map2 (fun wt t ->
     match t with
-        | 0. | 1. -> 0.
-        | _ -> (x -. w1 *. t) *. dt *. 1. /. (t *. (t -. 1.)))
-     path grid in
+        | 0. | 1. -> 0. (*div by zero*)
+        | _ -> (wt -. w1 *. t) *. dt *. 1. /. (t *. (t -. 1.)))
+    path grid in
     List.map (fun eigen_fun -> map2 (fun x y -> x *. y) (map eigen_fun grid) first_term |> fold_left (+.) 0.0) eigen_list
 ;;
 
@@ -66,7 +62,7 @@ W = W_1*t+I_1 e_1(t)+...
 *)
 let compute_basis deg n =
     let fdeg = float_of_int deg in
-    let path = bm_paths_bis 0. 1. 1. n 1 |> hd in
+    let path = bm_paths 0. 1. 1. n 1 |> hd in
     iter pprint path; print_string "BASIS:";
     jacobi (fdeg+.1.)
     |> eigen fdeg
@@ -74,8 +70,9 @@ let compute_basis deg n =
     |> iter pprint
 ;;
 
-let parabola_brownian n path =
-    let w1 = path |> rev |> hd in
+let sqrt6 = 2.4494897427831780982;;
+let parabola_brownian n path ?(w1bool = false) ?(w1 = 0.0) =
+    let w1 = if not w1bool then path |> rev |> hd else w1 in
     let eigen_func = jacobi 2. |> eigen 1. in
     let i1 = eigen_func |> basis 1. n path |> hd in
     (* let e1 = eigen_func |> hd in
