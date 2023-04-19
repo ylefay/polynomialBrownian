@@ -2,7 +2,6 @@ open Brownian;;
 open PolynomialKarhunenLoeveBrownian;;
 open List;;
 
-let oversqrt6 = 0.40824829046386301637;;
 (*
 Parabola-ODE method for Inhomogeneous Brownian Motion
 \mathrm{d}y_{t} = a(b-y_t)\mathrm{d}t+\sigma y_t\mathrm{d}W_t
@@ -14,16 +13,14 @@ Return [Y_0, Y_h, Y_2h,...] where h = t_max / n_t
 *)
 
 let parabola_igbm a b sigma y0 t_max n_t n_int =
-    let tildea = a+.0.5*.sigma*.sigma in
-    let h = t_max /. float_of_int n_t in
-    let sqrth = sqrt h in
-    let ds = h /. float_of_int n_int in
+    let tildea = a+.0.5*.sigma*.sigma and h = t_max /. float_of_int n_t in
+    let sqrth = sqrt h and ds = h /. float_of_int n_int in
     let grid = range 0. ds 1. n_int in
     let rec aux k accu =
         if k <= n_t then
-            let path = bm_paths_bis 0. 1. 1. n_int 1 (*(W_s)_{s\in[0,1]} will be rescaled*) in
-            let w1 = path |> hd |> rev |> hd in
-            let parabola = map (parabola_brownian n_int) path |> hd in
+            let path = bm_paths_bis 0. 1. 1. n_int 1 |> hd (*(W_s)_{s\in[0,1]} will be rescaled*) in
+            let w1 = path |> rev |> hd in
+            let parabola = parabola_brownian n_int path in
             match accu with
                 | yk::_->
                     let integrands = map (fun s -> exp (tildea*.s*.h-.sigma*.sqrth*.(parabola s)) *. ds) grid in
@@ -34,20 +31,21 @@ let parabola_igbm a b sigma y0 t_max n_t n_int =
     in aux 1 [y0]
     ;;
 
-(*parabola_igbm 0.1 0.04 0.6 0.06 5. 10000 10000 |> iter pprint;;*)
+parabola_igbm 0.1 0.04 0.6 0.06 5. 10000 10000 |> iter pprint;;
 
-
+(*
+Log-ODE method
+Y_{k+1} = Y_k e^{-\tilde{a}h + \sigma W_{t_k,t_{k+1}}} + abh\bigg(1-\sigma H_{t_k,t_{k+1}}+\sigma^2\bigg(3/5h H_{t_k,t_{k+1}}^2+1/30h\bigg)\bigg)\frac{e^{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}}-1}{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}}
+*)
 let log_ode_igbm a b sigma y0 t_max n_t n_int =
-    let tildea = a+.0.5*.sigma*.sigma in
-    let h = t_max /. float_of_int n_t in
-    let sqrth = sqrt h in
-    let eigen_func = jacobi 2. |> eigen 1. in
+    let tildea = a+.0.5*.sigma*.sigma and h = t_max /. float_of_int n_t in
+    let sqrth = sqrt h and eigen_func = jacobi 2. |> eigen 1. in
     let rec aux k accu =
         if k <= n_t then
             let path = bm_paths_bis 0. 1. 1. n_int 1 |> hd (*(W_s)_{s\in[0,1]} will be rescaled*) in
             let w1 = path |> rev |> hd in
             let i1 = eigen_func |> basis 1. n_int path |> hd in
-            let space_time_levy_area = oversqrt6 *. i1 in
+            let space_time_levy_area = 0.40824829046386301637 *. i1 in
             match accu with
                 | yk::_->
                     let ykp1 = yk*.(exp (-1.*.tildea*.h+.sigma*.sqrth*.w1)) +. a*.b*.h*.(
@@ -61,4 +59,4 @@ let log_ode_igbm a b sigma y0 t_max n_t n_int =
     ;;
 
 
-log_ode_igbm 0.1 0.04 0.6 0.06 5. 10000 10000 |> iter pprint;;
+(*log_ode_igbm 0.1 0.04 0.6 0.06 5. 10000 10000 |> iter pprint;;*)

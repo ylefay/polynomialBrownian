@@ -2,4 +2,6 @@
 *.cmo
 *.cmx
 *.out
+*.o
+*.txt
 .idea

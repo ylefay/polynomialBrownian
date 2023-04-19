@@ -12,6 +12,9 @@ let c_sum l =
     | hd::tl -> let tmp_sum = pre+.hd in sum tmp_sum (tmp_sum::acc) tl
   in sum 0. [] l
 
+(*
+range function, maybe use an iterator, iter from c-cube repo ?
+*)
 let range start step stop nn =
     let rec aux j n =
             if j < stop && n < nn then j :: aux (j+.step) (n+1) else []
@@ -38,7 +41,7 @@ let normal_gen_2 mu sigma =
 Generate normal increments
 *)
 let dW_gen n dt =
-  let dW () = normal_gen_2 0. (sqrt dt) in
+  let dW () = normal_gen 0. (sqrt dt) in
   fun () -> init n (fun _ -> dW ())
 
 (*
