@@ -10,6 +10,8 @@ Y_0 := y_0
 Y_{k+1} := e^{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}} (Y_k + ab\int_{t_k}^{t_{k+1}} e^{\tilde{a}(s-t_k)-\sigma \tilde{W}_{t_k,s}}\mathrm{d}s
 
 Return [Y_0, Y_h, Y_2h,...] where h = t_max / n_t
+
+Generate on the fly the brownian motion, no memory overflow but not reproducible.
 *)
 
 let parabola_igbm a b sigma y0 t_max n_t n_int =
@@ -32,8 +34,6 @@ let parabola_igbm a b sigma y0 t_max n_t n_int =
     ;;
 
 
-Printf.printf "\n parabola_ode \n";;
-parabola_igbm 0.1 0.04 0.6 0.06 1. 10000 10000 |> iter pprint;;
 
 (*
 Log-ODE method
@@ -60,20 +60,20 @@ let log_ode_igbm a b sigma y0 t_max n_t n_int =
     in aux 1 [y0]
     ;;
 
-Printf.printf "\n log_ode \n";;
-log_ode_igbm 0.1 0.04 0.6 0.06 1. 10000 10000 |> iter pprint;;
-
-let log_ode_igbm_given_path a b sigma y0 path n t_max =
-    let tildea = a+.0.5*.sigma*.sigma in
-    let n_int = length path / n and h = t_max /. float_of_int n in
-    let ds = h /. float_of_int n_int and sqrth = sqrt h in
+(*
+reproducible (given path), can cause stack overflow
+slower than log_ode_igbm given equals n_int & n_t
+*)
+let log_ode_igbm_given_path a b sigma y0 path n_t t_max =
+    let tildea = a+.0.5*.sigma*.sigma and n_int = length path / n_t and h = t_max /. float_of_int n_t in
+    let sqrth = sqrt h in
     let oversqrth = 1. /. sqrth in
-    let splitted_brownian = split_f path n and grid = range 0. ds 1. n_int in
+    let splitted_brownian = split_f path n_t in
     let standardized_brownians =
         map (fun w -> let w0 = hd w in map (fun wt -> oversqrth *. (wt -. w0)) w) splitted_brownian in
     let eigen_func = jacobi 2. |> eigen 1. in
     let rec aux accu ongoing_standardized_brownians k =
-        if k <= n then
+        if k <= n_t then
             match ongoing_standardized_brownians with
                 | current_path::other_paths ->
                     let w1 = current_path |> rev |> hd in
@@ -90,16 +90,20 @@ let log_ode_igbm_given_path a b sigma y0 path n t_max =
     in aux [y0] standardized_brownians 1
     ;;
 
-let parabola_igbm_given_path a b sigma y0 path n t_max =
+(*
+reproducible (given path), can cause memory overflow
+slower than parabola_igbm given equals n_int & n_t
+*)
+let parabola_igbm_given_path a b sigma y0 path n_t t_max =
     let tildea = a+.0.5*.sigma*.sigma in
-    let n_int = length path / n and h = t_max /. float_of_int n in
+    let n_int = length path / n_t and h = t_max /. float_of_int n_t in
     let ds = h /. float_of_int n_int and sqrth = sqrt h in
     let oversqrth = 1. /. sqrth in
-    let splitted_brownian = split_f path n and grid = range 0. ds 1. n_int in
+    let splitted_brownian = split_f path n_t and grid = range 0. ds 1. n_int in
     let standardized_brownians =
         map (fun w -> let w0 = hd w in map (fun wt -> oversqrth *. (wt -. w0)) w) splitted_brownian in
     let rec aux accu ongoing_standardized_brownians k =
-        if k <= n then
+        if k <= n_t then
             match ongoing_standardized_brownians with
                 | current_path::other_paths ->
                 let w1 = current_path |> rev |> hd in
@@ -114,8 +118,15 @@ let parabola_igbm_given_path a b sigma y0 path n t_max =
     in aux [y0] standardized_brownians 1
     ;;
 
+(*on the fly*)
+Printf.printf "\n parabola_ode \n";;
+parabola_igbm 0.1 0.04 0.6 0.06 1. 10000 1000 |> iter pprint;;
+Printf.printf "\n log_ode \n";;
+log_ode_igbm 0.1 0.04 0.6 0.06 1. 10000 1000 |> iter pprint;;
 Printf.printf "\n parabola_ode_given_path \n";;
-let mypath = bm_paths 0.0 1.0 1. 100000 1 |> hd in
+
+(*given path*)
+let mypath = bm_paths 0.0 1.0 1. 10000000 1 |> hd in (*n_int*n_t*)
 parabola_igbm_given_path 0.1 0.04 0.6 0.06 mypath 10000 1. |> iter pprint;
-Printf.printf "\n log_ode_given_path\n";
+Printf.printf "\n log_ode_given_path \n";
 log_ode_igbm_given_path 0.1 0.04 0.6 0.06 mypath 10000 1. |> iter pprint;;

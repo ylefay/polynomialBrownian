@@ -10,11 +10,11 @@ let _ = Random.self_init();;
 (*
 cumulative sum function
 *)
-let c_sum l =
+let c_sum init l =
   let rec sum pre acc = function
     | [] -> rev acc
     | hd::tl -> let tmp_sum = pre+.hd in sum tmp_sum (tmp_sum::acc) tl
-  in sum 0. [] l
+  in sum init [] l
 
 (*
 range function, maybe use an iterator, iter from c-cube repo ?
@@ -53,15 +53,14 @@ Construct brownian paths
 *)
 let bm_paths x0 sigma t n m =
     let dt = t /. (float_of_int n) in
-    let generate = dW_gen n dt in
+    let generate = dW_gen n (sigma*.sigma*.dt) in
     init m (fun _ ->
         generate ()
-        |> c_sum
-        |> map (fun bm -> x0 +. sigma *. bm)
+        |> c_sum x0
     );;
 
 (*
-split list in multiple subarrays
+split list in multiple sublists
 *)
 let split_f list n =
     let l = length list / n in
@@ -78,4 +77,3 @@ let split_f list n =
                 | _ -> rev accu
     in aux [[]] list 0;;
 
-split_f [3;2;1] 3;;
