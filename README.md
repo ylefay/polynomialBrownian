@@ -32,12 +32,12 @@ $$z_{i+1} = z_i + \frac{h}{n}f_0(z_{i})+\frac{1}{n}f_1(z_{i})(W_{kh,(k+1)h}+(6-1
 
 In practice, we split our brownian motion and normalize each part, that is we consider the mapping
 
-$$(W_t)_{0\leqt\leq T} \mapsto ((h^{-1/2}(W_{kh+s}-W_{kh}))_{0\leq s\leq h})_{k}.$$
+$$(W_t)_{0\leq t\leq T} \mapsto ((h^{-1/2}(W_{kh+s}-W_{kh}))_{0\leq s\leq h})_{k}.$$
 
 Then, we use the scaling property of brownian motion. We also use the following equality $H_{t_k,t_{k+1}} = \sqrt{\frac{h}{6}}I_1$.
 
 # Polynomial-ODE method
-Same numerical scheme as the previous but we replace 
+Same numerical scheme as the previous one but we replace 
 $$(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h})$$ 
 
 by
