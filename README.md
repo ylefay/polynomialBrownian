@@ -29,9 +29,7 @@ $$
 z_0 = Y_k$$
 For each $0\leq i \leq n-1$,
 $$
-z_{i+1} = z_i + f_1(z_{i}})(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h}) + \frac{h}{n}f_0(z_{i})$$
-$$
-z_{n} = Y_{k+1}$$
+z_{i+1} = z_i + f_1(z_{i})(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h}) + \frac{h}{n}f_0(z_{i})$$
 
 # Inhomogeneous Geometric Brownian Motion
 Consider the following Stratonovich SDE:
