@@ -25,7 +25,6 @@ and for each $k\geq 0$,
 $$Y_{k+1} = z_n$$.
 
 For each $k$, we define $z$ by
-
 $$z_0 = Y_k$$
 For each $0\leq i \leq n-1$,
 
