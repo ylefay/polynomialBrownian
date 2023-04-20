@@ -34,3 +34,5 @@ let split_and_normalize_brownian path n_t h =
     let splitted_brownian = split_f path n_t in
     let standardized_brownians = map (fun w -> let w0 = hd w in map (fun wt -> 1./.(sqrt h) *. (wt -. w0)) w) splitted_brownian
     in standardized_brownians;;
+
+let pprint x = print_float x; print_string ",";;

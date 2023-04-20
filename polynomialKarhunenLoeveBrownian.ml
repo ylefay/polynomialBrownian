@@ -1,6 +1,7 @@
-open Polynomial
-open Brownian
-open List
+open Polynomial;;
+open Brownian;;
+open List;;
+open Utils;;
 
 
 (*
@@ -35,8 +36,6 @@ let eigen deg jacobi_list =
         fun t -> evaluer p (2.*.t-.1.)
     in map2 aux (init (length jacobi_list) (fun x -> float_of_int ((length jacobi_list) - x))) jacobi_list
 ;;
-
-let pprint x = print_float x; print_string ",";;
 
 (*let paths = bm_paths 0. 1. 1. 1000 1;;
 map (fun path -> List.iter print_float path) paths;;*)

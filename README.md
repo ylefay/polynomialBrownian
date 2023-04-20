@@ -61,7 +61,37 @@ In practice, we split our brownian motion and normalize each part. Then, we use 
 # Compilation and performance profiling
 Please see `http://ocamlverse.net/content/optimizing_performance.html`
 ```
-ocamlopt -g ./polynomial.ml ./brownian.ml ./polynomialKarhunenLoeveBrownian.ml ./igbm.ml 
-perf record --call-graph=dwarf -- ./a.out
+ocamlopt -g -O3 utils.ml normal.ml brownian.ml polynomial.ml polynomialKarhunenLoeveBrownian.ml parabola_method.ml igbm.ml main.ml -o main
+perf record --call-graph=dwarf -- ./main
 perf report
+
+hyperfine './main 1000' './main 10000' './main 100000' './main 1000000'
+```
+
+1000 points (Y_1, ..., Y_1000), with a Brownian motion sampled {1000, 10000, 100000, 1000000} times.
+
+```
+Benchmark 1: ./main 1000
+  Time (mean ± σ):       7.5 ms ±   0.6 ms    [User: 5.2 ms, System: 2.5 ms]
+  Range (min … max):     6.7 ms …  13.6 ms    270 runs
+ 
+  Warning: Statistical outliers were detected. Consider re-running this benchmark on a quiet PC without any interferences from other programs. It might help to use the '--warmup' or '--prepare' options.
+ 
+Benchmark 2: ./main 10000
+  Time (mean ± σ):      26.0 ms ±   0.7 ms    [User: 22.3 ms, System: 3.5 ms]
+  Range (min … max):    24.9 ms …  28.7 ms    101 runs
+ 
+Benchmark 3: ./main 100000
+  Time (mean ± σ):     335.7 ms ±   3.5 ms    [User: 322.8 ms, System: 10.7 ms]
+  Range (min … max):   329.2 ms … 342.1 ms    10 runs
+ 
+Benchmark 4: ./main 1000000
+  Time (mean ± σ):     15.826 s ±  0.232 s    [User: 15.631 s, System: 0.085 s]
+  Range (min … max):   15.487 s … 16.248 s    10 runs
+ 
+Summary
+  './main 1000' ran
+    3.49 ± 0.32 times faster than './main 10000'
+   44.97 ± 3.92 times faster than './main 100000'
+ 2120.08 ± 186.04 times faster than './main 1000000'
 ```
