@@ -22,13 +22,13 @@ We define $(Y_k)$ the approximation of the solution $(y_0, y_h, \ldots)$ by
 
 $$Y_0 := y_0$$
 and for each $k\geq 0$,
-$$Y_{k+1} = z_n$$.
+$$Y_{k+1} = z_n.$$
 
 For each $k$, we define $z$ by
 $$z_0 = Y_k$$
 For each $0\leq i \leq n-1$,
 
-$$z_{i+1} = z_i + f_1(z_{i})(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h}) + \frac{h}{n}f_0(z_{i})$$
+$$z_{i+1} = z_i + \frac{h}{n}f_0(z_{i})+\frac{1}{n}f_1(z_{i})(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h})$$
 
 # Inhomogeneous Geometric Brownian Motion
 Consider the following Stratonovich SDE:
@@ -57,8 +57,7 @@ $$
 Y_{k+1} = Y_k e^{-\tilde{a}h + \sigma W_{t_k,t_{k+1}}} + abh\bigg(1-\sigma H_{t_k,t_{k+1}}+\sigma^2\bigg(3/5h H_{t_k,t_{k+1}}^2+1/30h\bigg)\bigg)\frac{e^{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}}-1}{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}}
 $$
 
-In practice, we normalize the different part of our brownian motion and use the scaling property of brownian motion as well as
-the following equality $H_{t_k,t_{k+1}} = \sqrt{\frac{h}{6}}I_1$.
+In practice, we split our brownian motion and normalize each part. Then, we use the scaling property of brownian motion as well as the following equality $H_{t_k,t_{k+1}} = \sqrt{\frac{h}{6}}I_1$.
 # Compilation and performance profiling
 Please see `http://ocamlverse.net/content/optimizing_performance.html`
 ```

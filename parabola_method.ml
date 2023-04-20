@@ -2,6 +2,22 @@ open Brownian;;
 open Utils;;
 open PolynomialKarhunenLoeveBrownian;;
 open List;;
+
+(*
+Space time levy area, see Definition 4.2.1
+*)
+let oversqrt6 = 0.40824829046386301637;;
+let space_time_levy_area_fun n_int =
+    let eigen_func = jacobi 2. |> eigen 1. in
+    fun path ?w1 -> begin
+        let w1 = match w1 with
+                    | None -> path |> rev |> hd
+                    | Some w1 -> w1 in
+        let i1 = eigen_func |> basis 1. n_int path ~w1:w1 |> hd in
+        let space_time_levy_area_value = oversqrt6 *. i1 in
+        space_time_levy_area_value
+        end;;
+
 (*
 Parabola-ODE method for Stratovitch SDE:
 \mathrm{d}y_{t} = f_0(y_t)\mathrm{d}t+f_1(y_t)\circ\mathrm{d}W_t
@@ -25,27 +41,61 @@ Equivalently, we can replace
     1/n_int*((6-12i/n_int)H1/sqrt6 + W1)
 We still obtain a diffusion term prop. to sqrt(h) after n_int steps.
 *)
-
-
-let oversqrt6 = 0.40824829046386301637;;
 let parabola_given_path path f0 f1 y0 n_t t_max =
     let n_int = length path / n_t and h = t_max /. float_of_int n_t in
     let ds = h /. float_of_int n_int and sqrth = sqrt h in
-    let oversqrth = 1. /. sqrth and du = 1./.(float_of_int n_int) and eigen_func = jacobi 2. |> eigen 1. in
-    let splitted_brownian = split_f path n_t and grid = range 0. du 1. n_int in
-    let standardized_brownians =
-        map (fun w -> let w0 = hd w in map (fun wt -> oversqrth *. (wt -. w0)) w) splitted_brownian in
+    let du = 1./.(float_of_int n_int) and space_time_levy_area_fun = space_time_levy_area_fun n_int in
+    let grid = range 0. du 1. n_int in
+    let standardized_brownians = split_and_normalize_brownian path n_t h in
     let rec aux accu ongoing_standardized_brownians k =
         if k <= n_t then
             match ongoing_standardized_brownians with
                 | current_path::other_paths ->
                 let w1 = current_path |> rev |> hd in
-                let i1 = eigen_func |> basis 1. n_int current_path ~w1bool:true ~w1:w1 |> hd in
-                let space_time_levy_area = oversqrt6 *. i1 in
-                                       (*let parabola = parabola_brownian n_int current_path ~w1bool:true ~w1:w1 in*)
+                let space_time_levy_area = space_time_levy_area_fun current_path ?w1:(Some w1) in
                                        match accu with
                                         | yk::_-> (*numerical scheme*)
                                             let sum_integrand = fun pre u -> pre +. (sqrth) *. (f1 pre) *. (w1 +. (6. -. 12. *. u)*.space_time_levy_area)*.du +. (f0 pre)*.ds in
+                                            let ykp1 = (fold_left sum_integrand yk grid) in
+                                        aux (ykp1::accu) other_paths (k+1)
+        else
+            rev accu
+    in aux [y0] standardized_brownians 1
+    ;;
+
+
+(*
+Polynomial-ODE method for Stratovitch SDE:
+\mathrm{d}y_{t} = f_0(y_t)\mathrm{d}t+f_1(y_t)\circ\mathrm{d}W_t
+
+The Polynomial-ODE method is similar to the Parabola-ODE method where
+we replace \tilde{W} by W^n, the n-th degree polynomial approximation of W.
+
+We have ||W-W^n||_{L_2(P)} = O(n^{-1/2}).
+
+Here we haven't implemented the composition nor the derivation of polynomials,
+Instead we compute the finite differences for dW^n/du
+*)
+let polynomial_given_path deg path f0 f1 y0 n_t t_max =
+    let n_int = length path / n_t and h = t_max /. float_of_int n_t in
+    let ds = h /. float_of_int n_int and sqrth = sqrt h in
+    let du = 1./.(float_of_int n_int) in let grid = range 0. du 1. n_int in
+    let eigen_list = jacobi (float_of_int deg) |> eigen (float_of_int deg -. 1.) in
+    let grid = range 0. du 1. n_int in
+    let standardized_brownians = split_and_normalize_brownian path n_t h in
+    let rec aux accu ongoing_standardized_brownians k =
+        if k <= n_t then
+            match ongoing_standardized_brownians with
+                | current_path::other_paths ->
+                let w1 = current_path |> rev |> hd in
+                let basis_coefficients = basis (float_of_int deg -. 1.) n_int current_path ~w1:(w1) eigen_list in
+                let brownian_pol_fun = fun t ->
+                    map2 (fun coeff eigen_fun -> coeff *. (eigen_fun t)) basis_coefficients eigen_list
+                    |> fold_left (+.) (w1*.t) in
+                                       match accu with
+                                        | yk::_-> (*numerical scheme*)
+                                        (*one may want to handle composition of polynomials (P ° 2X-1), then derivation of polynomials to compute dtilde(W) precisely*)
+                                            let sum_integrand = fun pre u -> pre +. (sqrth) *. (f1 pre) *. ((brownian_pol_fun (u+.du))-.(brownian_pol_fun u))+. (f0 pre)*.ds in
                                             let ykp1 = (fold_left sum_integrand yk grid) in
                                         aux (ykp1::accu) other_paths (k+1)
         else

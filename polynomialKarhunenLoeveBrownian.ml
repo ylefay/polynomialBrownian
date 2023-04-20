@@ -20,7 +20,7 @@ let jacobi deg =
                 | pm1::pm2::_ -> aux (n+.1.) ([produit (somme (produit [{coeff=(n+.1.)*.(2.*.n+.1.); deg=1}] pm1) (produit [{coeff=(-.1.)*.n*.(n+.1.); deg=0}] pm2)) ([{coeff=1./.(n*.(n+.2.)); deg=0}])] @ accu)
                 | _ -> accu
     in match deg with
-    | 2. -> [[{coeff=0.5; deg=3}; {coeff=(-0.5); deg=1}]]
+    | 2. -> [[{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}]]
     | 3. -> [[{coeff=0.5; deg=3}; {coeff=(-0.5); deg=1}]; [{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}]]
     | _ -> aux 2. [[{coeff=0.5; deg=3}; {coeff=(-0.5); deg=1}]; [{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}]]
 ;;
@@ -42,8 +42,11 @@ let pprint x = print_float x; print_string ",";;
 map (fun path -> List.iter print_float path) paths;;*)
 
 
-let basis deg n path ?(w1bool = false) ?(w1 = 0.0) eigen_list =
-    let dt = 1. /. float_of_int n and w1 = if not w1bool then path |> rev |> hd else w1 in
+let basis deg n path ?w1 eigen_list =
+    let w1 = match w1 with
+        | None -> path |> rev |> hd
+        | Some w1 -> w1 in
+    let dt = 1. /. float_of_int n in
     let grid = range 0. dt 1. n in
     let first_term = map2 (fun wt t ->
     match t with
@@ -66,15 +69,17 @@ let compute_basis deg n =
     iter pprint path; print_string "BASIS:";
     jacobi (fdeg+.1.)
     |> eigen fdeg
-    |> basis fdeg n path ~w1bool:false ~w1:0.0
+    |> basis fdeg n path ?w1:None
     |> iter pprint
 ;;
 
 let sqrt6 = 2.4494897427831780982;;
-let parabola_brownian n path ?(w1bool = false) ?(w1 = 0.0) =
-    let w1 = if not w1bool then path |> rev |> hd else w1 in
+let parabola_brownian n path ?(w1) =
+    let w1 = match w1 with
+        | None -> path |> rev |> hd
+        | Some w1 -> w1 in
     let eigen_func = jacobi 2. |> eigen 1. in
-    let i1 = eigen_func |> basis 1. n path ~w1bool:true ~w1:w1 |> hd in
+    let i1 = eigen_func |> basis 1. n path ~w1:w1 |> hd in
     (* let e1 = eigen_func |> hd in
     fun t -> (w1*.t +. i1*.(e1 t));;*)  (*Wpara(t) = W_1t + I_2sqrt(6)t(t-1) *)
     fun t -> w1*.t +. i1*.sqrt6*.t*.(t-.1.)
@@ -86,4 +91,3 @@ let parabola_brownian n path ?(w1bool = false) ?(w1 = 0.0) =
 compute_basis 10 500;;*)
 
 (*parabola_brownian 500 (bm_paths 0. 1. 1. 500 1 |> hd) 5.;;*)
-let evalp t f = evaluer f t |> pprint;;

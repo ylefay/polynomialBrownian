@@ -25,3 +25,12 @@ let c_sum init l =
     | hd::tl -> let tmp_sum = pre+.hd in sum tmp_sum (tmp_sum::acc) tl
   in sum init [] l
 
+(*
+split a brownian motion into n_t parts
+and normalize each part:
+(W_t) -> ((h^{-1/2}(W_s-W_kh))_{kh<=s<=(k+1)h})
+*)
+let split_and_normalize_brownian path n_t h =
+    let splitted_brownian = split_f path n_t in
+    let standardized_brownians = map (fun w -> let w0 = hd w in map (fun wt -> 1./.(sqrt h) *. (wt -. w0)) w) splitted_brownian
+    in standardized_brownians;;
