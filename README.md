@@ -17,20 +17,19 @@ Consider the following tsratonovich SDE:
 $$\mathrm{d}y_t = f_0(y_t)\mathrm{d}t + f_1(y_t)\circ \mathrm{d}W_t$$.
 
 The Parabola-ODE method (see theorem 4.3.11) gives the following numerical scheme:
-Let $h>0$, $n_int$ the number of points we consider inside every interval $[kh,(k+1)h]$.
-$$
-Y_0 := y_0$$
+Let $h>0$, $n$ the number of points we consider inside every interval $[kh,(k+1)h]$.
+$$ Y_0 := y_0$$
 
 For each $k\geq 1$,
 $$
-Y_{k+1} = z_{n_int}
+Y_{k+1} = z_{n}
 $$
 
-where, for $1\leq i \leq n_int$, $z$ is defined by
+where, for $1\leq i \leq n, $z$ is defined by
 $$
 z_0 = Y_k
-z_{i+1} = z_i + f_1(z_{i}})(W_{kh,(k+1)h}+(6-12\frac{i}{n_int})H_{kh,(k+1)h}) + \frac{h}{n_int}f_0(z_{i})
-z_{n_int} = Y_{k+1}
+z_{i+1} = z_i + f_1(z_{i}})(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h}) + \frac{h}{n}f_0(z_{i})
+z_{n} = Y_{k+1}
 $$
 
 # Inhomogeneous Geometric Brownian Motion
