@@ -14,21 +14,21 @@ $$k(k+2)P_{k+2}(X) = (k+1)(2k+1)XP_{k+1}(X)-k(k+1)P_k(X)$$
 
 # Parabola-ODE method
 Consider the following Stratonovich SDE:
-$$\mathrm{d}y_t = f_0(y_t)\mathrm{d}t + f_1(y_t)\circ \mathrm{d}W_t$$.
+$$\mathrm{d}y_t = f_0(y_t)\mathrm{d}t + f_1(y_t)\circ \mathrm{d}W_t.$$
 
 The Parabola-ODE method (see theorem 4.3.11) gives the following numerical scheme:
 Let $h>0$, $n$ the number of points we consider inside every interval $[kh,(k+1)h]$.
 We define $(Y_k)$ the approximation of the solution $(y_0, y_h, \ldots)$ by
 
-$$Y_0 := y_0$$
+$$Y_0 := y_0.$$
 and for each $k\geq 0$,
 $$Y_{k+1} = z_n.$$
 
 For each $k$, we define $z$ by
-$$z_0 = Y_k$$
+$$z_0 = Y_k.$$
 For each $0\leq i \leq n-1$,
 
-$$z_{i+1} = z_i + \frac{h}{n}f_0(z_{i})+\frac{1}{n}f_1(z_{i})(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h})$$
+$$z_{i+1} = z_i + \frac{h}{n}f_0(z_{i})+\frac{1}{n}f_1(z_{i})(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h}).$$
 
 In practice, we split our brownian motion and normalize each part, that is we consider the mapping
 
@@ -46,6 +46,8 @@ $$\sqrt{h}(W^n_k((i+1)/n)-W^n_k(i/n)),$$
 where $W^n_k$ is the $n$-th degree polynomial corresponding to the $(k+1)-th$ standardized part of our brownian motion.
 
 Since $W^n$ is a polynomial, it is easy to derivate it. One may want to implement composition and derivation of polynomials to compute $\frac{\mathrm{d}W^n_k}{\mathrm{d}u}(i/n)$. 
+
+We have $|W-W^n|_{L^2(\mathbb{P})} = O(n^{-1/2})$.
 
 # Inhomogeneous Geometric Brownian Motion
 Consider the following Stratonovich SDE:
