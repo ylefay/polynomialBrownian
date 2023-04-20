@@ -18,17 +18,22 @@ $$\mathrm{d}y_t = f_0(y_t)\mathrm{d}t + f_1(y_t)\circ \mathrm{d}W_t$$.
 
 The Parabola-ODE method (see theorem 4.3.11) gives the following numerical scheme:
 Let $h>0$, $n$ the number of points we consider inside every interval $[kh,(k+1)h]$.
-$$ Y_0 := y_0$$
+We define $(Y_k)$ the approximation of the solution $(y_0, y_h, \ldots)$ by
 
-For each $k\geq 1$,
+$$Y_0 := y_0$$
+and
+For each $k\geq 0$,
 $$
 Y_{k+1} = z_{n}
-$$
+$$.
 
-where, for $1\leq i \leq n, $z$ is defined by
+For each $k$, we define $z$ by
 $$
-z_0 = Y_k
+z_0 = Y_k$$
+For each $0\leq i \leq n-1$,
+$$
 z_{i+1} = z_i + f_1(z_{i}})(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h}) + \frac{h}{n}f_0(z_{i})
+$$
 z_{n} = Y_{k+1}
 $$
 
