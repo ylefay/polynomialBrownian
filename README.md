@@ -13,7 +13,7 @@ For each $k\geq 2$, we have
 $$k(k+2)P_{k+2}(X) = (k+1)(2k+1)XP_{k+1}(X)-k(k+1)P_k(X)$$
 
 # Parabola-ODE method
-Consider the following tsratonovich SDE:
+Consider the following Stratonovich SDE:
 $$\mathrm{d}y_t = f_0(y_t)\mathrm{d}t + f_1(y_t)\circ \mathrm{d}W_t$$.
 
 The Parabola-ODE method (see theorem 4.3.11) gives the following numerical scheme:
