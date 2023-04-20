@@ -30,6 +30,15 @@ For each $0\leq i \leq n-1$,
 
 $$z_{i+1} = z_i + \frac{h}{n}f_0(z_{i})+\frac{1}{n}f_1(z_{i})(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h})$$
 
+In practice, we split our brownian motion and normalize each part, that is we map $(W_t)_{0\leqt\leq T}$ to $((h^{-1/2}(W_{kh+s}-W_{kh}))_{0\leq s\leq h})_{k}$. 
+Then, we use the scaling property of brownian motion. We also use the following equality $H_{t_k,t_{k+1}} = \sqrt{\frac{h}{6}}I_1$.
+
+# Polynomial-ODE method
+Same numerical scheme as the previous but we replace $(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h})$ by $\sqrt{h}(W^n_k((i+1)/n)-W^n_k(i/n))$, where $W^n_k$ is the
+$(k+1)-th$ standardized part of our brownian motion.
+
+Since $W^n$ is a polynomial, one may want to implement composition and derivation of polynomials to compute $\frac{\mathrm{d}W^n_k}{\mathrm{d}u}(i/n)$. 
+
 # Inhomogeneous Geometric Brownian Motion
 Consider the following Stratonovich SDE:
 
@@ -57,7 +66,6 @@ $$
 Y_{k+1} = Y_k e^{-\tilde{a}h + \sigma W_{t_k,t_{k+1}}} + abh\bigg(1-\sigma H_{t_k,t_{k+1}}+\sigma^2\bigg(3/5h H_{t_k,t_{k+1}}^2+1/30h\bigg)\bigg)\frac{e^{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}}-1}{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}}
 $$
 
-In practice, we split our brownian motion and normalize each part. Then, we use the scaling property of brownian motion as well as the following equality $H_{t_k,t_{k+1}} = \sqrt{\frac{h}{6}}I_1$.
 # Compilation and performance profiling
 Please see `http://ocamlverse.net/content/optimizing_performance.html`
 ```
