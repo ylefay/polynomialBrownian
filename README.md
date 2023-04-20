@@ -21,11 +21,8 @@ Let $h>0$, $n$ the number of points we consider inside every interval $[kh,(k+1)
 We define $(Y_k)$ the approximation of the solution $(y_0, y_h, \ldots)$ by
 
 $$Y_0 := y_0$$
-and
-For each $k\geq 0$,
-$$
-Y_{k+1} = z_{n}
-$$.
+and for each $k\geq 0$,
+$$Y_{k+1} = z_n$$.
 
 For each $k$, we define $z$ by
 $$
