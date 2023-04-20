@@ -42,8 +42,8 @@ let pprint x = print_float x; print_string ",";;
 map (fun path -> List.iter print_float path) paths;;*)
 
 
-let basis deg n path eigen_list =
-    let dt = 1. /. float_of_int n and w1 = path |> rev |> hd in
+let basis deg n path ?(w1bool = false) ?(w1 = 0.0) eigen_list =
+    let dt = 1. /. float_of_int n and w1 = if not w1bool then path |> rev |> hd else w1 in
     let grid = range 0. dt 1. n in
     let first_term = map2 (fun wt t ->
     match t with
@@ -66,7 +66,7 @@ let compute_basis deg n =
     iter pprint path; print_string "BASIS:";
     jacobi (fdeg+.1.)
     |> eigen fdeg
-    |> basis fdeg n path
+    |> basis fdeg n path ~w1bool:false ~w1:0.0
     |> iter pprint
 ;;
 
@@ -74,7 +74,7 @@ let sqrt6 = 2.4494897427831780982;;
 let parabola_brownian n path ?(w1bool = false) ?(w1 = 0.0) =
     let w1 = if not w1bool then path |> rev |> hd else w1 in
     let eigen_func = jacobi 2. |> eigen 1. in
-    let i1 = eigen_func |> basis 1. n path |> hd in
+    let i1 = eigen_func |> basis 1. n path ~w1bool:true ~w1:w1 |> hd in
     (* let e1 = eigen_func |> hd in
     fun t -> (w1*.t +. i1*.(e1 t));;*)  (*Wpara(t) = W_1t + I_2sqrt(6)t(t-1) *)
     fun t -> w1*.t +. i1*.sqrt6*.t*.(t-.1.)

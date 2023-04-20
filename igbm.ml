@@ -1,4 +1,5 @@
 open Brownian;;
+open Utils;;
 open PolynomialKarhunenLoeveBrownian;;
 open List;;
 
@@ -24,9 +25,8 @@ let parabola_igbm a b sigma y0 t_max n_t n_int =
             let w1 = path |> rev |> hd in
             let parabola = parabola_brownian n_int path ~w1bool:true ~w1:w1 in
             match accu with
-                | yk::_->
-                    let integrands = map (fun s -> exp (tildea*.s*.h-.sigma*.sqrth*.(parabola s)) *. ds) grid in
-                    let ykp1 = exp (-1.*.tildea*.h+.sqrth *.sigma*.w1)*.(yk+.a*.b*.(fold_left (+.) 0.0 integrands)) in
+                | yk::_->  let sum_integrand = fun pre s -> pre +. exp (tildea*.s*.h-.sigma*.sqrth*.(parabola s)) *. ds in
+                    let ykp1 = exp (-1.*.tildea*.h+.sqrth *.sigma*.w1)*.(yk+.a*.b*.(fold_left sum_integrand 0.0 grid)) in
                 aux (k+1) (ykp1::accu)
         else
             rev accu
@@ -47,7 +47,7 @@ let log_ode_igbm a b sigma y0 t_max n_t n_int =
         if k <= n_t then
             let path = bm_paths 0. 1. 1. n_int 1 |> hd (*(W_s)_{s\in[0,1]} will be rescaled*) in
             let w1 = path |> rev |> hd in
-            let i1 = eigen_func |> basis 1. n_int path |> hd in
+            let i1 = eigen_func |> basis 1. n_int path ~w1bool:true ~w1:w1 |> hd in
             let space_time_levy_area = oversqrt6 *. i1 in
             match accu with
                 | yk::_->
@@ -77,7 +77,7 @@ let log_ode_igbm_given_path a b sigma y0 path n_t t_max =
             match ongoing_standardized_brownians with
                 | current_path::other_paths ->
                     let w1 = current_path |> rev |> hd in
-                    let i1 = eigen_func |> basis 1. n_int current_path |> hd in
+                    let i1 = eigen_func |> basis 1. n_int current_path ~w1bool:true ~w1:w1 |> hd in
                     let space_time_levy_area = oversqrt6 *. i1 in
                     match accu with
                         | yk::_->
@@ -110,8 +110,8 @@ let parabola_igbm_given_path a b sigma y0 path n_t t_max =
                                        let parabola = parabola_brownian n_int current_path ~w1bool:true ~w1:w1 in
                                        match accu with
                                         | yk::_->
-                                            let integrands = map (fun s -> exp (tildea*.s*.h-.sigma*.sqrth*.(parabola s)) *. ds) grid in
-                                            let ykp1 = exp (-1.*.tildea*.h+.sqrth *.sigma*.w1)*.(yk+.a*.b*.(fold_left (+.) 0.0 integrands)) in
+                                            let sum_integrand = fun pre s -> pre +. exp (tildea*.s*.h-.sigma*.sqrth*.(parabola s)) *. ds in
+                                            let ykp1 = exp (-1.*.tildea*.h+.sqrth *.sigma*.w1)*.(yk+.a*.b*.(fold_left sum_integrand 0.0 grid)) in
                                         aux (ykp1::accu) other_paths (k+1)
         else
             rev accu
