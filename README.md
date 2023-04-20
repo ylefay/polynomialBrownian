@@ -12,6 +12,27 @@ where $e_k(t) = 1/k \sqrt{k(k+1)(2k+1)}P_{k+1}(2t-1)$.
 For each $k\geq 2$, we have
 $$k(k+2)P_{k+2}(X) = (k+1)(2k+1)XP_{k+1}(X)-k(k+1)P_k(X)$$
 
+# Parabola-ODE method
+Consider the following tsratonovich SDE:
+$$\mathrm{d}y_t = f_0(y_t)\mathrm{d}t + f_1(y_t)\circ \mathrm{d}W_t$$.
+
+The Parabola-ODE method (see theorem 4.3.11) gives the following numerical scheme:
+Let $h>0$, $n_int$ the number of points we consider inside every interval $[kh,(k+1)h]$.
+$$
+Y_0 := y_0$$
+
+For each $k\geq 1$,
+$$
+Y_{k+1} = z_{n_int}
+$$
+
+where, for $1\leq i \leq n_int$, $z$ is defined by
+$$
+z_0 = Y_k
+z_{i+1} = z_i + f_1(z_{i}})(W_{kh,(k+1)h}+(6-12\frac{i}{n_int})H_{kh,(k+1)h}) + \frac{h}{n_int}f_0(z_{i})
+z_{n_int} = Y_{k+1}
+$$
+
 # Inhomogeneous Geometric Brownian Motion
 Consider the following Stratonovich SDE:
 
@@ -39,7 +60,8 @@ $$
 Y_{k+1} = Y_k e^{-\tilde{a}h + \sigma W_{t_k,t_{k+1}}} + abh\bigg(1-\sigma H_{t_k,t_{k+1}}+\sigma^2\bigg(3/5h H_{t_k,t_{k+1}}^2+1/30h\bigg)\bigg)\frac{e^{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}}-1}{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}}
 $$
 
-where $H_{t_k,t_{k+1}} = \sqrt{\frac{h}{6}}I_1$.
+In practice, we normalize the different part of our brownian motion and use the scaling property of brownian motion as well as
+the following equality $H_{t_k,t_{k+1}} = \sqrt{\frac{h}{6}}I_1$.
 # Compilation and performance profiling
 Please see `http://ocamlverse.net/content/optimizing_performance.html`
 ```

@@ -13,12 +13,13 @@ Y_{k+1} := e^{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}} (Y_k + ab\int_{t_k}^{t_{k+1}} 
 Return [Y_0, Y_h, Y_2h,...] where h = t_max / n_t
 
 Generate on the fly the brownian motion, no memory overflow but not reproducible.
+Ues standardized brownian motion then scale it by sqrt h
 *)
 
 let parabola_igbm a b sigma y0 t_max n_t n_int =
     let tildea = a+.0.5*.sigma*.sigma and h = t_max /. float_of_int n_t in
     let sqrth = sqrt h and ds = h /. float_of_int n_int in
-    let grid = range 0. ds 1. n_int in
+    let grid = range 0. (1./.float_of_int n_int) 1. n_int in
     let rec aux k accu =
         if k <= n_t then
             let path = bm_paths 0. 1. 1. n_int 1 |> hd (*(W_s)_{s\in[0,1]} will be rescaled*) in
@@ -99,7 +100,7 @@ let parabola_igbm_given_path a b sigma y0 path n_t t_max =
     let n_int = length path / n_t and h = t_max /. float_of_int n_t in
     let ds = h /. float_of_int n_int and sqrth = sqrt h in
     let oversqrth = 1. /. sqrth in
-    let splitted_brownian = split_f path n_t and grid = range 0. ds 1. n_int in
+    let splitted_brownian = split_f path n_t and grid = range 0. (1./.float_of_int n_int) 1. n_int in
     let standardized_brownians =
         map (fun w -> let w0 = hd w in map (fun wt -> oversqrth *. (wt -. w0)) w) splitted_brownian in
     let rec aux accu ongoing_standardized_brownians k =
@@ -120,13 +121,21 @@ let parabola_igbm_given_path a b sigma y0 path n_t t_max =
 
 (*on the fly*)
 Printf.printf "\n parabola_ode \n";;
-parabola_igbm 0.1 0.04 0.6 0.06 1. 10000 1000 |> iter pprint;;
+parabola_igbm 0.1 0.04 0.6 0.06 1. 1000 1000 |> iter pprint;;
 Printf.printf "\n log_ode \n";;
-log_ode_igbm 0.1 0.04 0.6 0.06 1. 10000 1000 |> iter pprint;;
+log_ode_igbm 0.1 0.04 0.6 0.06 1. 1000 1000 |> iter pprint;;
 Printf.printf "\n parabola_ode_given_path \n";;
 
 (*given path*)
-let mypath = bm_paths 0.0 1.0 1. 10000000 1 |> hd in (*n_int*n_t*)
-parabola_igbm_given_path 0.1 0.04 0.6 0.06 mypath 10000 1. |> iter pprint;
+let mypath = bm_paths 0.0 1.0 1. 100000 1 |> hd;; (*n_int*n_t*)
+parabola_igbm_given_path 0.1 0.04 0.6 0.06 mypath 1000 1. |> iter pprint;
 Printf.printf "\n log_ode_given_path \n";
-log_ode_igbm_given_path 0.1 0.04 0.6 0.06 mypath 10000 1. |> iter pprint;;
+log_ode_igbm_given_path 0.1 0.04 0.6 0.06 mypath 1000 1. |> iter pprint;;
+
+Printf.printf "\n general parabola_ode_given_path \n";;
+open Parabola_method;;
+(* defining IGBM stratovitch sde*)
+let a = 0.1 and b = 0.04 and sigma=0.6 and y0 = 0.06 in
+let atilde = a +. 0.5*.sigma*.sigma and btilde = 2.*.a*.b/.(2.*.a+.sigma*.sigma) in
+let f0 yt = atilde*.(btilde-.yt) and f1 yt = sigma *. yt in
+parabola_given_path mypath f0 f1 y0 1000 1. |> iter pprint;;
