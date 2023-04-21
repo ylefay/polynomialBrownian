@@ -21,9 +21,13 @@ The Parabola-ODE method (see theorem 4.3.11) gives the following numerical schem
 Let $h>0$, $n$ the number of points we consider inside every interval $[kh,(k+1)h]$.
 We define $(Y_k)$ the approximation of the solution $(y_0, y_h, \ldots)$ by
 
-$$Y_0 := y_0.$$
+$$Y_0 := y_0.
+$$
+
 and for each $k\geq 0$,
-$$Y_{k+1} = z_n.$$
+
+$$Y_{k+1} := z_n.
+$$
 
 For each $k$, we define $z$ (we omit the dependency on $k$) by
 $$z_0 = Y_k.$$
