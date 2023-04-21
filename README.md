@@ -11,6 +11,7 @@ where $e_k(t) = 1/k \sqrt{k(k+1)(2k+1)}P_{k+1}(2t-1)$.
 
 For each $k\geq 2$, we have
 $$k(k+2)P_{k+2}(X) = (k+1)(2k+1)XP_{k+1}(X)-k(k+1)P_k(X)$$
+and $P_2(X) = 1/4(X^2-1)$, $P_3(X)=1/2X(X^2-1)$.
 
 # Parabola-ODE method
 Consider the following Stratonovich SDE:
@@ -24,7 +25,7 @@ $$Y_0 := y_0.$$
 and for each $k\geq 0$,
 $$Y_{k+1} = z_n.$$
 
-For each $k$, we define $z$ by
+For each $k$, we define $z$ (we omit the dependency on $k$) by
 $$z_0 = Y_k.$$
 For each $0\leq i \leq n-1$,
 
@@ -32,7 +33,7 @@ $$z_{i+1} = z_i + \frac{h}{n}f_0(z_{i})+\frac{1}{n}f_1(z_{i})(W_{kh,(k+1)h}+(6-1
 
 In practice, we split our brownian motion and normalize each part, that is we consider the mapping
 
-$$(W_t)_{0\leq t\leq T} \mapsto ((h^{-1/2}(W_{kh+s}-W_{kh}))_{0\leq s\leq h})_{k}.$$
+$$W \mapsto ((h^{-1/2}(W_{kh+s}-W_{kh}))_{0\leq s\leq h})_{k}.$$
 
 Then, we use the scaling property of brownian motion. We also use the following equality $H_{t_k,t_{k+1}} = \sqrt{\frac{h}{6}}I_1$.
 
