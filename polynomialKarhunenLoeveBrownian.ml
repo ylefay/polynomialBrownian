@@ -88,6 +88,20 @@ let parabola_brownian n path ?(w1) =
     fun t -> (w1*.t +. i1*.(e1 t));;*)  (*Wpara(t) = W_1t + I_2sqrt(6)t(t-1) *)
     fun t -> w1*.t +. i1*.sqrt6*.t*.(t-.1.)
 
+(*
+Space time levy area, see Definition 4.2.1
+*)
+let oversqrt6 = 0.40824829046386301637;;
+let space_time_levy_area_fun n_int =
+    let eigen_func = jacobi 2. |> eigen 1. in
+    fun path ?w1 -> begin
+        let w1 = match w1 with
+                    | None -> path |> rev |> hd
+                    | Some w1 -> w1 in
+        let i1 = eigen_func |> basis 1. n_int path ~w1:w1 |> hd in
+        let space_time_levy_area_value = oversqrt6 *. i1 in
+        space_time_levy_area_value
+        end;;
 (*let path = bm_paths 0. 1. 1. 50 1 |> hd |> iter pprint
     ;;*)
 (*map (fun f -> f 0.75) (eigen 1. (jacobi 2.)) |> iter pprint;;*)

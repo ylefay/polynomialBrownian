@@ -1,11 +1,18 @@
-open Parabola_method;;
 open PolynomialKarhunenLoeveBrownian;;
+open Utils;;
+open List;;
 
 (*
 Lie bracket
 Let U, V : R -> R
-[U, V](x) := (UV - VU)(x) = U(x)∂_x(V)(x) - V(x)∂_x(U)(x)
+[U, V](f) := (UV - VU)(f) = (U(x)∂_x(V)(x) - V(x)∂_x(U)(x))∂_x(f)
 *)
+let lie dx u v =
+  let overdx = 1. /. dx in
+  let du = fun x -> (u (x +. dx) -. u x) *. overdx in
+  let dv = fun x -> (v (x +. dx) -. v x) *. overdx in
+  let duv = fun x -> (u x *. dv x) -. (v x *. du x) in
+  fun f x -> duv x *. ((f (x +. dx) -. f x) *. overdx);;
 
 (*
 Log-ODE method for Stratovitch SDE:
@@ -20,8 +27,38 @@ Let W be a standardized brownian motion, let h > 0, and n_int be the number of p
 The corresponding numerical scheme to obtain Y_{k+1} ~= y_{(k+1}h} from Y_k is
 
 z_0 = Y_k
-z_{i+1} = z_i + f_0(z_{i})ds + \sqrt{h}f_1(z_{i}})(\tilde{W}_{i/n_int}-\tilde{W}_{(i-1)/n_int}) + [f_1,f_0](z)h^{3/2}I_1/sqrt(6)
-    + [f_1,[f_1,f_0]](z)(1/10h^{3/2}I1^2+1/30 h^2)
+z_{i+1} = z_i + f_0(z_{i})ds + \sqrt{h}(f_1(z_{i}) W1+ + [f_1,f_0](z)h I_1/sqrt(6)
+    + [f_1,[f_1,f_0]](z)(1/10hI1^2+1/30 h^1.5))
 z_{n_int} = Y_{k+1}
 where ds = h/n_int.
 *)
+let log_given_path path f0 f1 y0 n_t t_max =
+    let n_int = length path / n_t and h = t_max /. float_of_int n_t in
+    let ds = h /. float_of_int n_int and sqrth = sqrt h in
+    let h2 = h*.h in
+    let du = 1./.(float_of_int n_int) and space_time_levy_area_fun = space_time_levy_area_fun n_int in
+    let grid = range 0. du 1. n_int in
+    let standardized_brownians = split_and_normalize_brownian path n_t h in
+    let lie_bracket_10 = lie du f1 f0 (fun z -> z) in let lie_bracket_110 = lie du f1 lie_bracket_10 (fun z -> z) in
+    let rec aux accu ongoing_standardized_brownians k =
+        if k <= n_t then
+            match ongoing_standardized_brownians with
+                | current_path::other_paths ->
+                let w1 = current_path |> rev |> hd in
+                let space_time_levy_area = space_time_levy_area_fun current_path ?w1:(Some w1) in
+                                       match accu with
+                                        | yk::_-> (*numerical scheme*)
+                                            let sum_integrand = fun pre u ->
+                                                pre +. (f0 pre)*.ds +.
+                                                (sqrth) *.
+                                                (
+                                                (f1 pre) *. w1 +.
+                                                (lie_bracket_10 pre) *. h *. space_time_levy_area +.
+                                                (lie_bracket_110 pre) *. (0.6*.h*.(space_time_levy_area)*.(space_time_levy_area) +. 1./.30. *. h2)
+                                                )*.du in
+                                            let ykp1 = (fold_left sum_integrand yk grid) in
+                                        aux (ykp1::accu) other_paths (k+1)
+        else
+            rev accu
+    in aux [y0] standardized_brownians 1
+    ;;

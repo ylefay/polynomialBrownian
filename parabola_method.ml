@@ -4,21 +4,6 @@ open PolynomialKarhunenLoeveBrownian;;
 open List;;
 
 (*
-Space time levy area, see Definition 4.2.1
-*)
-let oversqrt6 = 0.40824829046386301637;;
-let space_time_levy_area_fun n_int =
-    let eigen_func = jacobi 2. |> eigen 1. in
-    fun path ?w1 -> begin
-        let w1 = match w1 with
-                    | None -> path |> rev |> hd
-                    | Some w1 -> w1 in
-        let i1 = eigen_func |> basis 1. n_int path ~w1:w1 |> hd in
-        let space_time_levy_area_value = oversqrt6 *. i1 in
-        space_time_levy_area_value
-        end;;
-
-(*
 Parabola-ODE method for Stratovitch SDE:
 \mathrm{d}y_{t} = f_0(y_t)\mathrm{d}t+f_1(y_t)\circ\mathrm{d}W_t
 

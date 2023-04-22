@@ -4,6 +4,7 @@ open Igbm;;
 open Gbm;;
 open Utils;;
 open Parabola_method;;
+open Log_method;;
 
 let n = try int_of_string Sys.argv.(1) with _ -> 1000000;;
 
@@ -27,9 +28,8 @@ mypath |> iter pprint;;
 
 Printf.printf "\n IGBM_Parabola\n";;
 parabola_igbm_given_path 0.1 0.04 0.6 0.06 mypath 1000 1. |> iter pprint;;
-(*
 Printf.printf "\n IGBM_Log_ODE\n";;
-log_ode_igbm_given_path 0.1 0.04 0.6 0.06 mypath 100 1. |> iter pprint;;
+log_ode_igbm_given_path 0.1 0.04 0.6 0.06 mypath 1000 1. |> iter pprint;;
 
 (* defining IGBM stratovitch sde*)
 let a = 0.1 and b = 0.04 and sigma=0.6 and y0 = 0.06;;
@@ -37,13 +37,13 @@ let atilde = a +. 0.5*.sigma*.sigma and btilde = 2.*.a*.b/.(2.*.a+.sigma*.sigma)
 let f0 yt = atilde*.(btilde-.yt) and f1 yt = sigma *. yt;;
 
 Printf.printf "\n polyparabola_integration_IGBM\n";;
-parabola_given_path mypath f0 f1 y0 100 1. |> iter pprint;;
+parabola_given_path mypath f0 f1 y0 1000 1. |> iter pprint;;
 Printf.printf "\n poly1_integration_IGBM\n";;
-polynomial_given_path 1 mypath f0 f1 y0 100 1. |> iter pprint;;
+polynomial_given_path 1 mypath f0 f1 y0 1000 1. |> iter pprint;;
 Printf.printf "\n poly2_integration_IGBM\n";;
-polynomial_given_path 2 mypath f0 f1 y0 100 1. |> iter pprint;;
+polynomial_given_path 2 mypath f0 f1 y0 1000 1. |> iter pprint;;
 Printf.printf "\n poly3_integration_IGBM\n";;
-polynomial_given_path 3 mypath f0 f1 y0 100 1. |> iter pprint;;
+polynomial_given_path 3 mypath f0 f1 y0 1000 1. |> iter pprint;;
 
 (*
 GBM simulations
@@ -68,7 +68,9 @@ dy_t = y_t^2 dW_t, y_0 = 1
 => y_t = 1/(1-W_t)
 *)
 Printf.printf "\n poly2_integration_CASE1\n";;
-polynomial_given_path 2 mypath (fun x -> 0.) (fun x -> x*.x) 1. 100 1. |> iter pprint;;
+polynomial_given_path 2 mypath (fun x -> 0.) (fun x -> x*.x) 1. 1000 1. |> iter pprint;;
+Printf.printf "\n log_integration_CASE1\n";;
+log_given_path mypath (fun x -> 0.) (fun x -> x*.x) 1. 1000 1. |> iter pprint;;
 (*
 Case 2:
 dy_t = y_t dt + y_t dW_t, y_0 = 1
@@ -76,16 +78,20 @@ a_strat = 1/2y_t
 => y_t = exp(1/2t + W_t)
 *)
 Printf.printf "\n poly2_integration_CASE2\n";;
-polynomial_given_path 2 mypath (fun x -> 0.5*.x) (fun x -> x) 2. 100 1. |> iter pprint;;
+polynomial_given_path 2 mypath (fun x -> 0.5*.x) (fun x -> x) 2. 1000 1. |> iter pprint;;
+Printf.printf "\n log_integration_CASE2\n";;
+log_given_path mypath (fun x -> 0.5*.x) (fun x -> x) 2. 1000 1. |> iter pprint;;
 
 Printf.printf "\n poly5_integration_CASE2\n";;
-polynomial_given_path 5 mypath (fun x -> 0.5*.x) (fun x -> x) 2. 100 1. |> iter pprint;;
+polynomial_given_path 5 mypath (fun x -> 0.5*.x) (fun x -> x) 2. 1000 1. |> iter pprint;;
 (*
 Case 3:
 dy_t = sin(y_t)dW_t, y_0 = pi/2
 *)
 Printf.printf "\n poly2_integration_CASE3\n";;
-polynomial_given_path 2 mypath (fun x -> 0.) (fun x -> sin x) (Float.pi /. 2.) 100 1. |> iter pprint;;
+polynomial_given_path 2 mypath (fun x -> 0.) (fun x -> sin x) (Float.pi /. 2.) 1000 1. |> iter pprint;;
+Printf.printf "\n log_integration_CASE3\n";;
+log_given_path mypath (fun x -> 0.) (fun x -> sin x) (Float.pi /. 2.) 1000 1. |> iter pprint;;
 
 (*
 Case 4:
@@ -96,7 +102,9 @@ d_yt = (a(b-y_t)-sigma/4)dt + sigma sqrt(y_t)°dW_t
 *)
 let a = 1. and b = 2. and sigma = 0.2;;
 Printf.printf "\n poly2_integration_CASE4\n";;
-polynomial_given_path 2 mypath (fun x -> a*.(b-.x)-.sigma*.0.25) (fun x -> sigma*. (sqrt x)) 1. 100 1. |> iter pprint;;
+polynomial_given_path 2 mypath (fun x -> a*.(b-.x)-.sigma*.0.25) (fun x -> sigma*. (sqrt x)) 1. 1000 1. |> iter pprint;;
+Printf.printf "\n log_integration_CASE4\n";;
+log_given_path mypath (fun x -> a*.(b-.x)-.sigma*.0.25) (fun x -> sigma*. (sqrt x)) 1. 1000 1. |> iter pprint;;
 
 (*
 Case 5:
@@ -109,5 +117,11 @@ Printf.printf "\n poly2_integration_CASE5\n";;
 polynomial_given_path 2 mypath
     (fun x -> x*.(1.-.x)-.0.5*.(1.-.2.*.x)/.(4.*. (sqrt (x*.(1.-.x)))))
     (fun x -> sqrt (x*.(1.-.x)))
-0.3 100 1. |> iter pprint;;
-*)
+0.3 1000 1. |> iter pprint;;
+Printf.printf "\n log_integration_CASE5\n";;
+log_given_path mypath
+    (fun x -> x*.(1.-.x)-.0.5*.(1.-.2.*.x)/.(4.*. (sqrt (x*.(1.-.x)))))
+    (fun x -> sqrt (x*.(1.-.x)))
+0.3 1000 1. |> iter pprint;;
+
+
