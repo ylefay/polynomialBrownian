@@ -42,3 +42,12 @@ let split_and_normalize_brownian path n_t h =
     in standardized_brownians;;
 
 let pprint x = print_float x; print_string ",";;
+
+
+(*
+range function, maybe use an iterator, iter from c-cube repo ?
+*)
+let range start step stop nn =
+    let rec aux j n =
+            if j < stop && n < nn then j :: aux (j+.step) (n+1) else []
+    in aux start 0;;

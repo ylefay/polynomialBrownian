@@ -69,13 +69,11 @@ See proof of theorem 4.1.6
 I_1, ..., I_deg s.t
 W = W_1*t+I_1 e_1(t)+...
 *)
-let compute_basis deg n =
+let compute_basis deg n standard_path =
     let fdeg = float_of_int deg in
-    let path = bm_paths 0. 1. 1. n 1 |> hd in
-    iter pprint path; print_string "BASIS:";
     jacobi (fdeg+.1.)
     |> eigen fdeg
-    |> basis fdeg n path ?w1:None
+    |> basis fdeg n standard_path ?w1:None
     |> iter pprint
 ;;
 

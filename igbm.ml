@@ -16,7 +16,6 @@ Return [Y_0, Y_h, Y_2h,...] where h = t_max / n_t
 Generate on the fly the brownian motion, no memory overflow but not reproducible.
 Ues standardized brownian motion then scale it by sqrt h
 *)
-
 let parabola_igbm a b sigma y0 t_max n_t n_int =
     let tildea = a+.0.5*.sigma*.sigma and h = t_max /. float_of_int n_t in
     let sqrth = sqrt h and ds = h /. float_of_int n_int in

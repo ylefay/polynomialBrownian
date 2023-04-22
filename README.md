@@ -13,6 +13,16 @@ For each $k\geq 2$, we have
 $$k(k+2)P_{k+2}(X) = (k+1)(2k+1)XP_{k+1}(X)-k(k+1)P_k(X)$$
 and $P_2(X) = 1/4(X^2-1)$, $P_3(X)=1/2X(X^2-1)$.
 
+# From Stratonovich SDE to Ito SDE
+Consider the following Ito SDE:
+$$\mathrm{d}y_t = f_0(y_t)\mathrm{d}t + f_1(y_t)\mathrm{d}W_t.$$
+
+It is equivalent to the Stratonovich SDE:
+$$\mathrm{d}y_t = \bar{f_0}(y_t)\mathrm{d}t + f_1(y_t)\mathrm{d}W_t.$$
+
+where 
+$$\bar{f_0} = f_0 - \frac{1}{2}f_1 \partial_x f_1.$$
+
 # Parabola-ODE method
 Consider the following Stratonovich SDE:
 $$\mathrm{d}y_t = f_0(y_t)\mathrm{d}t + f_1(y_t)\circ \mathrm{d}W_t.$$
@@ -84,37 +94,41 @@ $$
 # Compilation and performance profiling
 Please see `http://ocamlverse.net/content/optimizing_performance.html`
 ```
-ocamlopt -g -O3 utils.ml normal.ml brownian.ml polynomial.ml polynomialKarhunenLoeveBrownian.ml parabola_method.ml igbm.ml main.ml -o main
+ocamlopt -g -O3 utils.ml normal.ml brownian.ml polynomial.ml polynomialKarhunenLoeveBrownian.ml parabola_method.ml log_method.ml igbm.ml gbm.ml main.ml -o main
 perf record --call-graph=dwarf -- ./main
 perf report
 
 hyperfine './main 1000' './main 10000' './main 100000' './main 1000000'
 ```
-
+Running IGBM_Parabola.
 1000 points (Y_1, ..., Y_1000), with a Brownian motion sampled {1000, 10000, 100000, 1000000} times.
 
 ```
+hyperfine './main 1000' './main 10000' './main 100000' './main 1000000'
 Benchmark 1: ./main 1000
-  Time (mean ± σ):       7.5 ms ±   0.6 ms    [User: 5.2 ms, System: 2.5 ms]
-  Range (min … max):     6.7 ms …  13.6 ms    270 runs
+  Time (mean ± σ):       1.9 ms ±   0.4 ms    [User: 1.6 ms, System: 1.9 ms]
+  Range (min … max):     1.4 ms …   4.9 ms    464 runs
  
+  Warning: Command took less than 5 ms to complete. Note that the results might be inaccurate because hyperfine can not calibrate the shell startup time much more precise than this limit. You can try to use the `-N`/`--shell=none` option to disable the shell completely.
   Warning: Statistical outliers were detected. Consider re-running this benchmark on a quiet PC without any interferences from other programs. It might help to use the '--warmup' or '--prepare' options.
  
 Benchmark 2: ./main 10000
-  Time (mean ± σ):      26.0 ms ±   0.7 ms    [User: 22.3 ms, System: 3.5 ms]
-  Range (min … max):    24.9 ms …  28.7 ms    101 runs
+  Time (mean ± σ):      10.5 ms ±   1.3 ms    [User: 8.9 ms, System: 2.5 ms]
+  Range (min … max):     9.2 ms …  22.1 ms    189 runs
+ 
+  Warning: Statistical outliers were detected. Consider re-running this benchmark on a quiet PC without any interferences from other programs. It might help to use the '--warmup' or '--prepare' options.
  
 Benchmark 3: ./main 100000
-  Time (mean ± σ):     335.7 ms ±   3.5 ms    [User: 322.8 ms, System: 10.7 ms]
-  Range (min … max):   329.2 ms … 342.1 ms    10 runs
+  Time (mean ± σ):     113.5 ms ±   2.0 ms    [User: 105.3 ms, System: 8.2 ms]
+  Range (min … max):   111.2 ms … 120.4 ms    25 runs
  
 Benchmark 4: ./main 1000000
-  Time (mean ± σ):     15.826 s ±  0.232 s    [User: 15.631 s, System: 0.085 s]
-  Range (min … max):   15.487 s … 16.248 s    10 runs
+  Time (mean ± σ):      3.207 s ±  0.044 s    [User: 3.123 s, System: 0.064 s]
+  Range (min … max):    3.162 s …  3.313 s    10 runs
  
 Summary
   './main 1000' ran
-    3.49 ± 0.32 times faster than './main 10000'
-   44.97 ± 3.92 times faster than './main 100000'
- 2120.08 ± 186.04 times faster than './main 1000000'
+    5.60 ± 1.48 times faster than './main 10000'
+   60.33 ± 14.23 times faster than './main 100000'
+ 1703.98 ± 401.46 times faster than './main 1000000'
 ```

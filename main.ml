@@ -26,8 +26,8 @@ Printf.printf "\n BROWNIAN\n";;
 mypath |> iter pprint;;
 
 Printf.printf "\n IGBM_Parabola\n";;
-parabola_igbm_given_path 0.1 0.04 0.6 0.06 mypath 100 1. |> iter pprint;;
-
+parabola_igbm_given_path 0.1 0.04 0.6 0.06 mypath 1000 1. |> iter pprint;;
+(*
 Printf.printf "\n IGBM_Log_ODE\n";;
 log_ode_igbm_given_path 0.1 0.04 0.6 0.06 mypath 100 1. |> iter pprint;;
 
@@ -110,4 +110,4 @@ polynomial_given_path 2 mypath
     (fun x -> x*.(1.-.x)-.0.5*.(1.-.2.*.x)/.(4.*. (sqrt (x*.(1.-.x)))))
     (fun x -> sqrt (x*.(1.-.x)))
 0.3 100 1. |> iter pprint;;
-
+*)

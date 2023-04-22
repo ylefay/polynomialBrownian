@@ -36,9 +36,9 @@ where ds = h/n_int.
 
 See the diffusion term is in L^2(P) ~ sqrt(h/n_int) = sqrt(ds), over n_int step, sqrt(h).
 Equivalently, we can replace
-    (\tilde{W}_{i/n_int}-\tilde{W}_{(i-1)/n_int})~dW=((6-12u)H1/sqrt6 + W1)du
+    (\tilde{W}_{i/n_int}-\tilde{W}_{(i-1)/n_int})~dW=((6-12u)I1/sqrt6 + W1)du
      by setting du = 1/n_int, u = i/n_int
-    1/n_int*((6-12i/n_int)H1/sqrt6 + W1)
+    1/n_int*((6-12i/n_int)I1/sqrt6 + W1)
 We still obtain a diffusion term prop. to sqrt(h) after n_int steps.
 *)
 let parabola_given_path path f0 f1 y0 n_t t_max =
@@ -79,7 +79,7 @@ Here we use the derivation of polynomials to compute dW^n/du then multiply it by
 let polynomial_given_path deg path f0 f1 y0 n_t t_max =
     let n_int = length path / n_t and h = t_max /. float_of_int n_t in
     let ds = h /. float_of_int n_int and sqrth = sqrt h in
-    let du = 1./.(float_of_int n_int) in let grid = range 0. du 1. n_int in
+    let du = 1./.(float_of_int n_int) in
     let jac = jacobi (float_of_int deg) in
     let deigen_list =
         jac
@@ -101,7 +101,6 @@ let polynomial_given_path deg path f0 f1 y0 n_t t_max =
                     |> fold_left (+.) (w1) in
                                        match accu with
                                         | yk::_-> (*numerical scheme*)
-                                        (*one may want to handle composition of polynomials (P ° 2X-1), then derivation of polynomials to compute dtilde(W) precisely*)
                                             let sum_integrand = fun pre u -> pre +. (sqrth) *. (f1 pre) *. (dbrownian_pol_fun u) *. du+. (f0 pre)*.ds in
                                             let ykp1 = (fold_left sum_integrand yk grid) in
                                         aux (ykp1::accu) other_paths (k+1)
