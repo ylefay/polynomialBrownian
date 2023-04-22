@@ -54,7 +54,7 @@ let log_given_path path f0 f1 y0 n_t t_max =
                                                 (
                                                 (f1 pre) *. w1 +.
                                                 (lie_bracket_10 pre) *. h *. space_time_levy_area +.
-                                                (lie_bracket_110 pre) *. (0.6*.h*.(space_time_levy_area)*.(space_time_levy_area) +. 1./.30. *. h2)
+                                                (lie_bracket_110 pre) *. (0.6*.h*.space_time_levy_area*.space_time_levy_area +. 1./.30. *. h2)
                                                 )*.du in
                                             let ykp1 = (fold_left sum_integrand yk grid) in
                                         aux (ykp1::accu) other_paths (k+1)
