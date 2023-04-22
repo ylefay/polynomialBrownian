@@ -70,17 +70,24 @@ Polynomial-ODE method for Stratovitch SDE:
 
 The Polynomial-ODE method is similar to the Parabola-ODE method where
 we replace \tilde{W} by W^n, the n-th degree polynomial approximation of W.
+Or equivalently, we replace \circ\mathrm{d}W_t by \mathrm{d}W^n_t.
 
 We have ||W-W^n||_{L_2(P)} = O(n^{-1/2}).
 
-Here we haven't implemented the composition nor the derivation of polynomials,
-Instead we compute the finite differences for dW^n/du
+Here we use the derivation of polynomials to compute dW^n/du then multiply it by du.
 *)
 let polynomial_given_path deg path f0 f1 y0 n_t t_max =
     let n_int = length path / n_t and h = t_max /. float_of_int n_t in
     let ds = h /. float_of_int n_int and sqrth = sqrt h in
     let du = 1./.(float_of_int n_int) in let grid = range 0. du 1. n_int in
-    let eigen_list = jacobi (float_of_int deg) |> eigen (float_of_int deg -. 1.) in
+    let jac = jacobi (float_of_int deg) in
+    let deigen_list =
+        jac
+        |> d_eigen (float_of_int deg -. 1.)
+        and
+        eigen_list =
+        jac
+        |> eigen (float_of_int deg -. 1.) in (*de_k/dX, e_k*)
     let grid = range 0. du 1. n_int in
     let standardized_brownians = split_and_normalize_brownian path n_t h in
     let rec aux accu ongoing_standardized_brownians k =
@@ -89,13 +96,13 @@ let polynomial_given_path deg path f0 f1 y0 n_t t_max =
                 | current_path::other_paths ->
                 let w1 = current_path |> rev |> hd in
                 let basis_coefficients = basis (float_of_int deg -. 1.) n_int current_path ~w1:(w1) eigen_list in
-                let brownian_pol_fun = fun t ->
-                    map2 (fun coeff eigen_fun -> coeff *. (eigen_fun t)) basis_coefficients eigen_list
-                    |> fold_left (+.) (w1*.t) in
+                let dbrownian_pol_fun = fun t ->
+                    map2 (fun coeff deigen_fun -> coeff *. (deigen_fun t)) basis_coefficients deigen_list
+                    |> fold_left (+.) (w1) in
                                        match accu with
                                         | yk::_-> (*numerical scheme*)
                                         (*one may want to handle composition of polynomials (P ° 2X-1), then derivation of polynomials to compute dtilde(W) precisely*)
-                                            let sum_integrand = fun pre u -> pre +. (sqrth) *. (f1 pre) *. ((brownian_pol_fun (u+.du))-.(brownian_pol_fun u))+. (f0 pre)*.ds in
+                                            let sum_integrand = fun pre u -> pre +. (sqrth) *. (f1 pre) *. (dbrownian_pol_fun u) *. du+. (f0 pre)*.ds in
                                             let ykp1 = (fold_left sum_integrand yk grid) in
                                         aux (ykp1::accu) other_paths (k+1)
         else

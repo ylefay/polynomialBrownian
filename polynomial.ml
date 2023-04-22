@@ -27,7 +27,7 @@ let rec puissance_opti_square x n = match n with
     | 1 -> x
     | n -> let b = puissance_opti_square x (n / 2) in b*.b*. (if n mod 2 = 0 then 1. else x)
 
-
+(*Horner's algorithm?*)
 let rec evaluer p x =
     match p with
     | [] -> 0.
@@ -48,3 +48,13 @@ let afficher p = match p with
 (* Afficher avec retour à la ligne *)
 let afficher_bis p = afficher p ; print_newline ()
 ;;
+
+(* Polynomial derivation *)
+let rec derive p = match p with
+    | ({coeff=an; deg=n})::p1p ->
+        ({coeff=float_of_int n *. an; deg=n-1})::(derive p1p)
+    | _ -> []
+;;
+
+let pol = [{coeff=1.; deg=2}] |> derive in
+    evaluer pol 2. |> print_float;;

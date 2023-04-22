@@ -11,6 +11,7 @@ Numerical approximations for stochastic differential equations, Foster
 (* Theorem 4.1.10 (A recurrence relation for constructing Jacobi-like polynomials)
 Assuming the product and the sum of two polynomials are done in O(1), we obtain
 the sequence of Jacobi polynomials of degree between 2 and n in O(n)
+
 *)
 let jacobi deg =
     let rec aux n accu =
@@ -32,13 +33,19 @@ O(n)
 
 let eigen deg jacobi_list =
     let aux k pol_jac_kp1 =
-        let p = (produit [{coeff=1./.k *. (sqrt (k*.(k+.1.)*.(2.*.k+.1.)) ); deg=0}] pol_jac_kp1) in
-        fun t -> evaluer p (2.*.t-.1.)
+        let jac_before_composition = (produit [{coeff=1./.k *. (sqrt (k*.(k+.1.)*.(2.*.k+.1.)) ); deg=0}] pol_jac_kp1) in
+        fun t -> evaluer jac_before_composition (2.*.t-.1.)
     in map2 aux (init (length jacobi_list) (fun x -> float_of_int ((length jacobi_list) - x))) jacobi_list
 ;;
 
-(*let paths = bm_paths 0. 1. 1. 1000 1;;
-map (fun path -> List.iter print_float path) paths;;*)
+let d_eigen deg jacobi_list =
+    let aux k pol_jac_kp1 =
+        let d_jac_before_composition =
+            (produit [{coeff=1./.k *. (sqrt (k*.(k+.1.)*.(2.*.k+.1.)) ); deg=0}] pol_jac_kp1)
+            |> derive in
+        fun t -> 2.*. (evaluer d_jac_before_composition (2.*.t-.1.)) (*F = P°(2X-1), F' = 2P'°(2X-1)*)
+    in map2 aux (init (length jacobi_list) (fun x -> float_of_int ((length jacobi_list) - x))) jacobi_list
+
 
 
 let basis deg n path ?w1 eigen_list =

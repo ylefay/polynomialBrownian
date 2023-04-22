@@ -4,16 +4,22 @@ split list in multiple sublists
 *)
 let split_f list n =
     let l = length list / n in
-    let rec aux accu accu2 j =
+    let rec aux accu c_list j =
         if j < l then
-            match accu2 with
-                | x::q -> match accu with
+            begin
+            match c_list with
+                | x::q ->
+                    begin
+                    match accu with
                     | y::qp -> aux ([y@[x]]@qp) q (j+1)
-                    | _ -> aux [[x]] q (j+1)
+                    | [] -> aux [[x]] q (j+1)
+                    end
+                | [] -> rev accu
+            end
         else
-            match accu2 with
+            match c_list with
                 | x::q -> aux ([[x]]@accu) q 1
-                | _ -> rev accu
+                | [] -> rev accu
     in aux [[]] list 0;;
 
 (*
