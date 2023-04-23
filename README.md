@@ -71,9 +71,7 @@ We have $|W-W^n|_{L^2(\mathbb{P})} = O(n^{-1/2})$.
 # Log-ODE method
 The numerical scheme comes from the following ODE:
 
-$$
-\frac{\mathrm{d}z}{\mathrm{d}u} = f_0(z)h + f_1(z)W_{t_{k},t_{k+1}} + \[f_1,f_0\](z) h H_{t_k,t_{k+1}} + \[f_1, \[f_1,f_0\]\](z)(0.6hH^2_{t_k,t_{k+1}}+1/30h^2).
-$$
+$$\frac{\mathrm{d}z}{\mathrm{d}u} = f_0(z)h + f_1(z)W_{t_{k},t_{k+1}} + \[f_1,f_0\](z) h H_{t_k,t_{k+1}} + \[f_1, \[f_1,f_0\]\](z)(0.6hH^2_{t_k,t_{k+1}}+1/30h^2).$$
 
 # Inhomogeneous Geometric Brownian Motion
 Consider the following Stratonovich SDE:
