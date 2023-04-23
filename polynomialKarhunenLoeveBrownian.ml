@@ -104,7 +104,7 @@ Space time levy area, see Definition 4.2.1
 *)
 let oversqrt6 = 0.40824829046386301637;;
 let space_time_levy_area_fun n_int =
-    fun path ?w1 -> begin
+    fun path w1 -> begin
         let w1 = match w1 with
                     | None -> path |> last
                     | Some w1 -> w1 in

@@ -48,7 +48,7 @@ let log_ode_igbm a b sigma y0 t_max n_t n_int =
         for i = 1 to n_t do
             let path = bm_paths 0. 1. 1. n_int 1 |> first (*(W_s)_{s\in[0,1]} will be rescaled*) in
             let w1 = path |> last in
-            let space_time_levy_area = space_time_levy_area_fun path ?w1:(Some w1) in
+            let space_time_levy_area = space_time_levy_area_fun path (Some w1) in
             res.(i) <- res.(i-1)*.(exp (-1.*.tildea*.h+.sigma*.sqrth*.w1)) +. a*.b*.h*.(
                         1. -. sigma *. space_time_levy_area *. sqrth +. sigma*.sigma*.(0.6*.h*.space_time_levy_area*.space_time_levy_area+.1./.30.*.h))*.
                         (exp (-1.*.tildea*.h+.sigma*.sqrth*.w1) -. 1.) /. (-1. *.tildea*.h+.sigma*.sqrth*.w1);
@@ -72,7 +72,7 @@ let log_ode_igbm_given_path a b sigma y0 path n_t t_max =
         for i = 1 to n_t do
             let current_path = standardized_brownians.(i-1) in
             let w1 = current_path |> last in
-            let space_time_levy_area = space_time_levy_area_fun current_path ?w1:(Some w1) in
+            let space_time_levy_area = space_time_levy_area_fun current_path (Some w1) in
             res.(i) <- res.(i-1)*.(exp (-1.*.tildea*.h+.sigma*.sqrth*.w1)) +. a*.b*.h*.(
                                 1. -. sigma *. space_time_levy_area *. sqrth +. sigma*.sigma*.(0.6*.h*.space_time_levy_area*.space_time_levy_area+.1./.30.*.h))*.
                                 (exp (-1.*.tildea*.h+.sigma*.sqrth*.w1) -. 1.) /. (-1. *.tildea*.h+.sigma*.sqrth*.w1)

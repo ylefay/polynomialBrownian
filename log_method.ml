@@ -45,7 +45,7 @@ let log_given_path path f0 f1 y0 n_t t_max =
         for i = 1 to n_t do
             let current_path = standardized_brownians.(i-1) in
             let w1 = current_path |> last in
-            let space_time_levy_area = space_time_levy_area_fun current_path ?w1:(Some w1) in
+            let space_time_levy_area = space_time_levy_area_fun current_path (Some w1) in
             (* numerical scheme *)
             let sum_integrand = fun pre u ->
                 pre +. (f0 pre)*.ds +.

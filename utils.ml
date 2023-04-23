@@ -42,11 +42,12 @@ and normalize each part:
 *)
 let split_and_normalize_brownian path n_t h =
     let splitted_brownian = split_f path n_t in
-    let standardized_brownians = Array.map (fun w -> let w0 = first w in Array.map (fun wt -> 1./.(sqrt h) *. (wt -. w0)) w) splitted_brownian
+    let standardized_brownians =
+        splitted_brownian
+        |> Array.map (fun w -> Array.map (fun wt -> 1./.(sqrt h) *. (wt -. w.(0))) w)
     in standardized_brownians;;
 
 let pprint x = print_float x; print_string ",";;
-
 
 (*
 range function, maybe use an iterator, iter from c-cube repo ?
