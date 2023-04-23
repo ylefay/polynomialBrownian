@@ -27,7 +27,13 @@ $$\bar{f_0} = f_0 - \frac{1}{2}f_1 \partial_x f_1.$$
 Consider the following Stratonovich SDE:
 $$\mathrm{d}y_t = f_0(y_t)\mathrm{d}t + f_1(y_t)\circ \mathrm{d}W_t.$$
 
-The Parabola-ODE method (see theorem 4.3.11) gives the following numerical scheme:
+The corresponding Parabola-ODE (theorem 4.3.11) is
+
+$$
+\frac{\mathrm{d}z}{\mathrm{d}u} = f_0(z)h + f_1(z)(W_{t_k,t_{k+1}} + (6-12u)H_{t_k,t_{k+1}})
+$$
+
+This gives the following numerical scheme:
 Let $h>0$, $n$ the number of points we consider inside every interval $[kh,(k+1)h]$.
 We define $(Y_k)$ the approximation of the solution $(y_0, y_h, \ldots)$ by
 
@@ -63,6 +69,12 @@ where $W^n_k$ is the $n$-th degree polynomial corresponding to the $(k+1)-th$ st
 Since $W^n$ is a polynomial, it is easy to derivate it. One may want to implement composition and derivation of polynomials to compute $\frac{\mathrm{d}W^n_k}{\mathrm{d}u}(i/n)$. 
 
 We have $|W-W^n|_{L^2(\mathbb{P})} = O(n^{-1/2})$.
+
+# Log-ODE method
+The numerical scheme comes from the following ODE:
+$$
+\frac{\mathrm{d}z}{\mathrm{d}u} = f_0(z)h + f_1(z)W_{t_{k},t_{k+1}} + [f_1,f_0](z) h H_{t_k,t_{k+1}} + [f_1, [f_1,f_0]](z)(0.6hH^2_{t_k,t_{k+1}}+1/30h^2).
+$$
 
 # Inhomogeneous Geometric Brownian Motion
 Consider the following Stratonovich SDE:
