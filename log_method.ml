@@ -35,8 +35,9 @@ let log_given_path path f0 f1 y0 n_t t_max =
     let n_int = Array.length path / n_t and h = t_max /. float_of_int n_t in
     let ds = h /. float_of_int n_int and sqrth = sqrt h in
     let h2 = h*.h in
-    let du = 1./.(float_of_int n_int) and space_time_levy_area_fun = space_time_levy_area_fun n_int in
+    let du = 1./.(float_of_int n_int) in
     let grid = range 0. du n_int in
+    let space_time_levy_area_fun = space_time_levy_area_fun n_int ?grid:(Some grid) in
     let standardized_brownians = split_and_normalize_brownian path n_t h in
     let lie_bracket_10 = lie du f1 f0 (fun z -> z) in let lie_bracket_110 = lie du f1 lie_bracket_10 (fun z -> z) in
     let res = Array.make (n_t + 1) 0.0 in
@@ -44,7 +45,7 @@ let log_given_path path f0 f1 y0 n_t t_max =
         res.(0) <- y0;
         for i = 1 to n_t do
             let current_path = standardized_brownians.(i-1) in
-            let w1 = current_path |> last in
+            let w1 = last current_path in
             let space_time_levy_area = space_time_levy_area_fun current_path (Some w1) in
             (* numerical scheme *)
             let sum_integrand = fun pre u ->

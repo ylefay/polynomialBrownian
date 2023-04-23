@@ -18,7 +18,7 @@ Consider the following Ito SDE:
 $$\mathrm{d}y_t = f_0(y_t)\mathrm{d}t + f_1(y_t)\mathrm{d}W_t.$$
 
 It is equivalent to the Stratonovich SDE:
-$$\mathrm{d}y_t = \bar{f_0}(y_t)\mathrm{d}t + f_1(y_t)\mathrm{d}W_t.$$
+$$\mathrm{d}y_t = \bar{f_0}(y_t)\mathrm{d}t + f_1(y_t)\circ\mathrm{d}W_t.$$
 
 where 
 $$\bar{f_0} = f_0 - \frac{1}{2}f_1 \partial_x f_1.$$

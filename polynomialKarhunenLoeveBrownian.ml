@@ -1,5 +1,5 @@
 open Polynomial;;
-open Brownian;;
+open Rand;;
 open Utils;;
 open Array;;
 
@@ -44,7 +44,7 @@ O(n)
 let eigen deg jacobi_list =
     let aux k pol_jac_kp1 =
         let jac_before_composition = (produit [{coeff=1./.k *. (sqrt (k*.(k+.1.)*.(2.*.k+.1.)) ); deg=0}] pol_jac_kp1) in
-        fun t -> evaluer jac_before_composition (2.*.t-.1.)
+        fun t -> evaluer_horner_jacobi jac_before_composition (2.*.t-.1.)
     in map2 aux (init (length jacobi_list) (fun x -> float_of_int ((length jacobi_list) - x))) jacobi_list
 ;;
 
@@ -53,17 +53,19 @@ let d_eigen deg jacobi_list =
         let d_jac_before_composition =
             (produit [{coeff=1./.k *. (sqrt (k*.(k+.1.)*.(2.*.k+.1.)) ); deg=0}] pol_jac_kp1)
             |> derive in
-        fun t -> 2.*. (evaluer d_jac_before_composition (2.*.t-.1.)) (*F = P°(2X-1), F' = 2P'°(2X-1)*)
+        fun t -> 2.*. (evaluer_horner_jacobi d_jac_before_composition (2.*.t-.1.)) (*F = P°(2X-1), F' = 2P'°(2X-1)*)
     in map2 aux (init (length jacobi_list) (fun x -> float_of_int ((length jacobi_list) - x))) jacobi_list
 
 
 
-let basis deg n path ?w1 eigen_list =
+let basis deg n ?grid eigen_list path w1 =
     let w1 = match w1 with
         | None -> path |> last
         | Some w1 -> w1 in
     let dt = 1. /. float_of_int n in
-    let grid = range 0. dt n in
+    let grid = match grid with
+        | None ->  range 0. dt n
+        | Some grid -> grid in
     let first_term = map2 (fun wt t ->
     match t with
         | 0. | 1. -> 0. (*div by zero*)
@@ -79,21 +81,26 @@ See proof of theorem 4.1.6
 I_1, ..., I_deg s.t
 W = W_1*t+I_1 e_1(t)+...
 *)
-let compute_basis deg n standard_path =
+let compute_basis deg n =
     let fdeg = float_of_int deg in
+    let fun_compute_basis =
     jacobi (deg+1)
     |> eigen fdeg
-    |> basis fdeg n standard_path ?w1:None
-    |> iter pprint
-;;
+    |> basis fdeg n ?grid:None
+    in
+    fun standard_path -> fun_compute_basis standard_path None;;
+
 
 let eigen_func = jacobi 2 |> eigen 1.
 let sqrt6 = 2.4494897427831780982;;
-let parabola_brownian n path ?(w1) =
+let parabola_brownian n ?grid path ?w1 =
     let w1 = match w1 with
         | None -> path |> last
         | Some w1 -> w1 in
-    let i1 = eigen_func |> basis 1. n path ~w1:w1 |> first in
+    let grid = match grid with
+        | None ->  range 0. (1./.float_of_int n) n
+        | Some grid -> grid in
+    let i1 = basis 1. n ~grid:grid eigen_func path (Some w1) |> first in
     (* let e1 = eigen_func |> hd in
     fun t -> (w1*.t +. i1*.(e1 t));;*)  (*Wpara(t) = W_1t + I_2sqrt(6)t(t-1) *)
     fun t -> w1*.t +. i1*.sqrt6*.t*.(t-.1.)
@@ -103,12 +110,16 @@ let parabola_brownian n path ?(w1) =
 Space time levy area, see Definition 4.2.1
 *)
 let oversqrt6 = 0.40824829046386301637;;
-let space_time_levy_area_fun n_int =
+let space_time_levy_area_fun n_int ?grid =
+    let grid = match grid with
+        | None ->  range 0. (1./.float_of_int n_int) n_int
+        | Some grid -> grid in
+    let basis_coeff_fun = eigen_func |> basis 1. n_int ~grid:grid in
     fun path w1 -> begin
         let w1 = match w1 with
                     | None -> path |> last
                     | Some w1 -> w1 in
-        let i1 = eigen_func |> basis 1. n_int path ~w1:w1 |> first in
+        let i1 = basis_coeff_fun path (Some w1) |> first in
         let space_time_levy_area_value = oversqrt6 *. i1 in
         space_time_levy_area_value
         end;;

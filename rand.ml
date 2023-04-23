@@ -1,4 +1,5 @@
 open Array;;
+open Utils;;
 let pi = Float.pi;;
 (*
 Box-Muller method
@@ -44,3 +45,22 @@ let dW_gen_par n dt =
         fun () -> rest_increments@(map Domain.join list_increments |> concat)
         ;;
 *)
+
+
+
+(* random seed *)
+let _ = Random.self_init();;
+(* fix seed *)
+(*let _ = Random.init 1;;*)
+
+(*
+Construct brownian paths
+dW_gen_par is not faster than dW_gen?
+*)
+let bm_paths x0 sigma t n m =
+    let dt = t /. (float_of_int n) in
+    let generate = dW_gen n (sigma*.sigma*.dt) in
+    init m (fun _ ->
+        generate ()
+        |> c_sum x0
+    );;

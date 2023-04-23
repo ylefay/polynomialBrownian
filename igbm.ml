@@ -1,4 +1,4 @@
-open Brownian;;
+open Rand;;
 open Utils;;
 open PolynomialKarhunenLoeveBrownian;;
 open Parabola_method;;
@@ -20,12 +20,13 @@ let parabola_igbm a b sigma y0 t_max n_t n_int =
     let sqrth = sqrt h and ds = h /. float_of_int n_int in
     let grid = range 0. (1./.float_of_int n_int) n_int in
     let res = Array.make (n_t + 1) 0.0 in
+    let parabola_fun = parabola_brownian n_int ~grid:grid in
     let aux res =
         res.(0) <- y0;
         for i = 1 to n_t do
             let path = bm_paths 0. 1. 1. n_int 1 |> first (*(W_s)_{s\in[0,1]} will be rescaled*) in
             let w1 = path |> last in
-            let parabola = parabola_brownian n_int path ~w1:w1 in
+            let parabola = parabola_fun path ~w1:w1 in
             let sum_integrand = fun pre s -> pre +. exp (tildea*.s*.h-.sigma*.sqrth*.(parabola s)) *. ds in
             res.(i) <- exp (-1.*.tildea*.h+.sqrth *.sigma*.w1)*.(res.(i-1)+.a*.b*.(Array.fold_left sum_integrand 0.0 grid));
         done;
@@ -41,7 +42,7 @@ Y_{k+1} = Y_k e^{-\tilde{a}h + \sigma W_{t_k,t_{k+1}}} + abh\bigg(1-\sigma H_{t_
 *)
 let log_ode_igbm a b sigma y0 t_max n_t n_int =
     let tildea = a+.0.5*.sigma*.sigma and h = t_max /. float_of_int n_t in
-    let sqrth = sqrt h and space_time_levy_area_fun = space_time_levy_area_fun n_int in
+    let sqrth = sqrt h and space_time_levy_area_fun = space_time_levy_area_fun n_int ?grid:None in
     let res = Array.make (n_t + 1) 0.0 in
     let aux res =
         res.(0) <- y0;
@@ -65,7 +66,7 @@ let log_ode_igbm_given_path a b sigma y0 path n_t t_max =
     let tildea = a+.0.5*.sigma*.sigma and n_int = Array.length path / n_t and h = t_max /. float_of_int n_t in
     let sqrth = sqrt h in
     let standardized_brownians = split_and_normalize_brownian path n_t h in
-    let space_time_levy_area_fun = space_time_levy_area_fun n_int in
+    let space_time_levy_area_fun = space_time_levy_area_fun n_int ?grid:None in
     let res = Array.make (n_t + 1) 0. in
     let rec aux res =
         res.(0) <- y0;
@@ -92,12 +93,13 @@ let parabola_igbm_given_path a b sigma y0 path n_t t_max =
     let grid = range 0. (1./. float_of_int n_int) n_int in
     let standardized_brownians = split_and_normalize_brownian path n_t h in
     let res = Array.make (n_t + 1) 0. in
+    let parabola_fun = parabola_brownian n_int ~grid:grid in
     let rec aux res =
         res.(0) <- y0;
         for i = 1 to n_t do
             let current_path = standardized_brownians.(i-1) in
             let w1 = current_path |> last in
-            let parabola = parabola_brownian n_int current_path ~w1:w1 in
+            let parabola = parabola_fun current_path ~w1:w1 in
             let sum_integrand = fun pre s -> pre +. exp (tildea*.s*.h-.sigma*.sqrth*.(parabola s)) *. ds in
             res.(i) <- exp (-1.*.tildea*.h+.sqrth *.sigma*.w1)*.(res.(i-1)+.a*.b*.(Array.fold_left sum_integrand 0.0 grid))
         done;

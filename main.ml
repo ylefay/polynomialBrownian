@@ -1,5 +1,5 @@
 open Array;;
-open Brownian;;
+open Rand;;
 open Igbm;;
 open Gbm;;
 open Utils;;
