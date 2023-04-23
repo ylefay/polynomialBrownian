@@ -63,10 +63,8 @@ $$(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h})$$
 
 by
 
-$$\sqrt{h}(W^n_k((i+1)/n)-W^n_k(i/n)),$$
+$$\sqrt{h}(\frac{\mathrm{d}W^n_k}{\mathrm{d}u}(i/n))$$
 where $W^n_k$ is the $n$-th degree polynomial corresponding to the $(k+1)-th$ standardized part of our brownian motion.
-
-Since $W^n$ is a polynomial, it is easy to derivate it. One may want to implement composition and derivation of polynomials to compute $\frac{\mathrm{d}W^n_k}{\mathrm{d}u}(i/n)$. 
 
 We have $|W-W^n|_{L^2(\mathbb{P})} = O(n^{-1/2})$.
 
