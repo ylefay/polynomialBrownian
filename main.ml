@@ -126,4 +126,12 @@ log_given_path mypath
     (fun x -> sqrt (x*.(1.-.x)))
 0.3 n_int 1. |> iter pprint;;
 
-
+(*
+Case 6:
+dy_t = 2 Sqrt(y_t)°dW_t
+*)
+Printf.printf "\n log_integration_CASE6\n";;
+log_given_path mypath
+    (fun x -> 0.)
+    (fun x -> 2. *. sqrt x)
+1.2 n_int 1. |> iter pprint;;

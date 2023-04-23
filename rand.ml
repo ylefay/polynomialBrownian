@@ -22,7 +22,7 @@ let normal_gen_2 mu sigma =
 Generate normal increments
 *)
 let dW_gen n dt =
-  let dW () = normal_gen_2 0. (sqrt dt) in
+  let dW () = normal_gen 0. (sqrt dt) in
   fun () -> init n (fun _ -> dW ());;
 
 (*
