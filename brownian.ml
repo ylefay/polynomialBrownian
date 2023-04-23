@@ -1,4 +1,4 @@
-open List;;
+open Array;;
 open Utils;;
 open Normal;;
 

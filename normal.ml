@@ -1,4 +1,4 @@
-open List;;
+open Array;;
 let pi = Float.pi;;
 (*
 Box-Muller method
@@ -35,7 +35,7 @@ Summary
     './brownian_parallel.out 4' ran
     1.13 pm 0.04 times faster than './brownian_parallel.out'
 *)
-
+(*
 let dW_gen_par n dt =
     let dW () = normal_gen_2 0. (sqrt dt) in
         let list_dW size = init size (fun _ -> dW ()) in
@@ -43,3 +43,4 @@ let dW_gen_par n dt =
         and rest_increments = n mod num_domains |> list_dW in
         fun () -> rest_increments@(map Domain.join list_increments |> concat)
         ;;
+*)

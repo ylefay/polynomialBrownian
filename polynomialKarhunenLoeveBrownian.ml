@@ -1,7 +1,7 @@
 open Polynomial;;
 open Brownian;;
-open List;;
 open Utils;;
+open Array;;
 
 
 (*
@@ -14,18 +14,28 @@ the sequence of Jacobi polynomials of degree between 2 and n in O(n)
 
 *)
 let jacobi deg =
-    let rec aux n accu =
-        if n >= deg -.1. then
-            accu
-        else
-            match accu with
-                | pm1::pm2::_ -> aux (n+.1.) ([produit (somme (produit [{coeff=(n+.1.)*.(2.*.n+.1.); deg=1}] pm1) (produit [{coeff=(-.1.)*.n*.(n+.1.); deg=0}] pm2)) ([{coeff=1./.(n*.(n+.2.)); deg=0}])] @ accu)
-                | _ -> accu
-    in match deg with
-    | 2. -> [[{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}]]
-    | 3. -> [[{coeff=0.5; deg=3}; {coeff=(-0.5); deg=1}]; [{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}]]
-    | _ -> aux 2. [[{coeff=0.5; deg=3}; {coeff=(-0.5); deg=1}]; [{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}]]
-;;
+      let res = Array.make (deg - 1) [] in
+      let aux res =
+          match deg with
+          | 1 -> ();
+          | 2 -> res.(0) <- [{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}];
+          | 3 -> res.(0) <- [{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}]; res.(1) <- [{coeff=0.5; deg=3}; {coeff=(-0.5); deg=1}];
+          | _ -> begin
+                    res.(0) <- [{coeff=0.25; deg=2}; {coeff=(-0.25); deg=0}];
+                    res.(1) <- [{coeff=0.5; deg=3}; {coeff=(-0.5); deg=1}];
+                    for i = 2 to (deg - 2) do
+                        let n = float_of_int i in
+                        let pm1 = res.(i-1) in
+                        let pm2 = res.(i-2) in
+                        let p1 = produit [{coeff=(n+.1.)*.(2.*.n+.1.); deg=1}] pm1 in
+                        let p2 = produit [{coeff=(-.1.)*.n*.(n+.1.); deg=0}] pm2 in
+                        let p3 = somme p1 p2 in
+                        let p4 = produit [{coeff=1./.(n*.(n+.2.)); deg=0}] p3 in
+                        res.(i) <- p4;
+                    done
+                end
+      in
+      let _ = aux res in res;;
 
 (* Theorem 4.1.0, expression for e_k
 O(n)
@@ -50,16 +60,16 @@ let d_eigen deg jacobi_list =
 
 let basis deg n path ?w1 eigen_list =
     let w1 = match w1 with
-        | None -> path |> rev |> hd
+        | None -> path |> last
         | Some w1 -> w1 in
     let dt = 1. /. float_of_int n in
-    let grid = range 0. dt 1. n in
+    let grid = range 0. dt n in
     let first_term = map2 (fun wt t ->
     match t with
         | 0. | 1. -> 0. (*div by zero*)
         | _ -> (wt -. w1 *. t) *. dt *. 1. /. (t *. (t -. 1.)))
     path grid in
-    List.map (fun eigen_fun -> map2 (fun x y -> x *. y) (map eigen_fun grid) first_term |> fold_left (+.) 0.0) eigen_list
+    Array.map (fun eigen_fun -> map2 (fun x y -> x *. y) (map eigen_fun grid) first_term |> fold_left (+.) 0.0) eigen_list
 ;;
 
 (*
@@ -71,19 +81,19 @@ W = W_1*t+I_1 e_1(t)+...
 *)
 let compute_basis deg n standard_path =
     let fdeg = float_of_int deg in
-    jacobi (fdeg+.1.)
+    jacobi (deg+1)
     |> eigen fdeg
     |> basis fdeg n standard_path ?w1:None
     |> iter pprint
 ;;
 
-let eigen_func = jacobi 2. |> eigen 1.
+let eigen_func = jacobi 2 |> eigen 1.
 let sqrt6 = 2.4494897427831780982;;
 let parabola_brownian n path ?(w1) =
     let w1 = match w1 with
-        | None -> path |> rev |> hd
+        | None -> path |> last
         | Some w1 -> w1 in
-    let i1 = eigen_func |> basis 1. n path ~w1:w1 |> hd in
+    let i1 = eigen_func |> basis 1. n path ~w1:w1 |> first in
     (* let e1 = eigen_func |> hd in
     fun t -> (w1*.t +. i1*.(e1 t));;*)  (*Wpara(t) = W_1t + I_2sqrt(6)t(t-1) *)
     fun t -> w1*.t +. i1*.sqrt6*.t*.(t-.1.)
@@ -96,16 +106,9 @@ let oversqrt6 = 0.40824829046386301637;;
 let space_time_levy_area_fun n_int =
     fun path ?w1 -> begin
         let w1 = match w1 with
-                    | None -> path |> rev |> hd
+                    | None -> path |> last
                     | Some w1 -> w1 in
-        let i1 = eigen_func |> basis 1. n_int path ~w1:w1 |> hd in
+        let i1 = eigen_func |> basis 1. n_int path ~w1:w1 |> first in
         let space_time_levy_area_value = oversqrt6 *. i1 in
         space_time_levy_area_value
         end;;
-(*let path = bm_paths 0. 1. 1. 50 1 |> hd |> iter pprint
-    ;;*)
-(*map (fun f -> f 0.75) (eigen 1. (jacobi 2.)) |> iter pprint;;*)
-(*
-compute_basis 10 500;;*)
-
-(*parabola_brownian 500 (bm_paths 0. 1. 1. 500 1 |> hd) 5.;;*)

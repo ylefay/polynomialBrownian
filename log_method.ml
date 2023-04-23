@@ -1,6 +1,5 @@
 open PolynomialKarhunenLoeveBrownian;;
 open Utils;;
-open List;;
 
 (*
 Lie bracket
@@ -33,32 +32,32 @@ z_{n_int} = Y_{k+1}
 where ds = h/n_int.
 *)
 let log_given_path path f0 f1 y0 n_t t_max =
-    let n_int = length path / n_t and h = t_max /. float_of_int n_t in
+    let n_int = Array.length path / n_t and h = t_max /. float_of_int n_t in
     let ds = h /. float_of_int n_int and sqrth = sqrt h in
     let h2 = h*.h in
     let du = 1./.(float_of_int n_int) and space_time_levy_area_fun = space_time_levy_area_fun n_int in
-    let grid = range 0. du 1. n_int in
+    let grid = range 0. du n_int in
     let standardized_brownians = split_and_normalize_brownian path n_t h in
     let lie_bracket_10 = lie du f1 f0 (fun z -> z) in let lie_bracket_110 = lie du f1 lie_bracket_10 (fun z -> z) in
-    let rec aux accu ongoing_standardized_brownians k =
-        if k <= n_t then
-            match ongoing_standardized_brownians with
-                | current_path::other_paths ->
-                let w1 = current_path |> rev |> hd in
-                let space_time_levy_area = space_time_levy_area_fun current_path ?w1:(Some w1) in
-                                       match accu with
-                                        | yk::_-> (*numerical scheme*)
-                                            let sum_integrand = fun pre u ->
-                                                pre +. (f0 pre)*.ds +.
-                                                (sqrth) *.
-                                                (
-                                                (f1 pre) *. w1 +.
-                                                (lie_bracket_10 pre) *. h *. space_time_levy_area +.
-                                                (lie_bracket_110 pre) *. (0.6*.h*.space_time_levy_area*.space_time_levy_area +. 1./.30. *. h2)
-                                                )*.du in
-                                            let ykp1 = (fold_left sum_integrand yk grid) in
-                                        aux (ykp1::accu) other_paths (k+1)
-        else
-            rev accu
-    in aux [y0] standardized_brownians 1
+    let res = Array.make (n_t + 1) 0.0 in
+    let rec aux res =
+        res.(0) <- y0;
+        for i = 1 to n_t do
+            let current_path = standardized_brownians.(i-1) in
+            let w1 = current_path |> last in
+            let space_time_levy_area = space_time_levy_area_fun current_path ?w1:(Some w1) in
+            (* numerical scheme *)
+            let sum_integrand = fun pre u ->
+                pre +. (f0 pre)*.ds +.
+                (sqrth) *.
+                (
+                (f1 pre) *. w1 +.
+                (lie_bracket_10 pre) *. h *. space_time_levy_area +.
+                (lie_bracket_110 pre) *. (0.6*.h*.space_time_levy_area*.space_time_levy_area +. 1./.30. *. h2)
+                )*.du
+            in
+            res.(i) <- Array.fold_left sum_integrand res.(i-1) grid
+        done;
+        in let _ = aux res in
+        res
     ;;

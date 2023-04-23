@@ -1,7 +1,6 @@
 open Brownian;;
 open Utils;;
 open PolynomialKarhunenLoeveBrownian;;
-open List;;
 
 (*
 Parabola-ODE method for Stratovitch SDE:
@@ -27,25 +26,24 @@ Equivalently, we can replace
 We still obtain a diffusion term prop. to sqrt(h) after n_int steps.
 *)
 let parabola_given_path path f0 f1 y0 n_t t_max =
-    let n_int = length path / n_t and h = t_max /. float_of_int n_t in
+    let n_int = Array.length path / n_t and h = t_max /. float_of_int n_t in
     let ds = h /. float_of_int n_int and sqrth = sqrt h in
     let du = 1./.(float_of_int n_int) and space_time_levy_area_fun = space_time_levy_area_fun n_int in
-    let grid = range 0. du 1. n_int in
+    let grid = range 0. du n_int in
     let standardized_brownians = split_and_normalize_brownian path n_t h in
-    let rec aux accu ongoing_standardized_brownians k =
-        if k <= n_t then
-            match ongoing_standardized_brownians with
-                | current_path::other_paths ->
-                let w1 = current_path |> rev |> hd in
-                let space_time_levy_area = space_time_levy_area_fun current_path ?w1:(Some w1) in
-                                       match accu with
-                                        | yk::_-> (*numerical scheme*)
-                                            let sum_integrand = fun pre u -> pre +. (sqrth) *. (f1 pre) *. (w1 +. (6. -. 12. *. u)*.space_time_levy_area)*.du +. (f0 pre)*.ds in
-                                            let ykp1 = (fold_left sum_integrand yk grid) in
-                                        aux (ykp1::accu) other_paths (k+1)
-        else
-            rev accu
-    in aux [y0] standardized_brownians 1
+    let res = Array.make (n_t + 1) 0.0 in
+    let aux res =
+        res.(0) <- y0;
+        for i = 1 to n_t do
+            let current_path = standardized_brownians.(i-1) in
+            let w1 = current_path |> last in
+            let space_time_levy_area = space_time_levy_area_fun current_path ?w1:(Some w1) in
+            (* numerical scheme *)
+            let sum_integrand = fun pre u -> pre +. (sqrth) *. (f1 pre) *. (w1 +. (6. -. 12. *. u)*.space_time_levy_area)*.du +. (f0 pre)*.ds in
+            res.(i) <- Array.fold_left sum_integrand res.(i-1) grid
+        done;
+    in let _ = aux res in
+    res
     ;;
 
 
@@ -62,10 +60,10 @@ We have ||W-W^n||_{L_2(P)} = O(n^{-1/2}).
 Here we use the derivation of polynomials to compute dW^n/du then multiply it by du.
 *)
 let polynomial_given_path deg path f0 f1 y0 n_t t_max =
-    let n_int = length path / n_t and h = t_max /. float_of_int n_t in
+    let n_int = Array.length path / n_t and h = t_max /. float_of_int n_t in
     let ds = h /. float_of_int n_int and sqrth = sqrt h in
     let du = 1./.(float_of_int n_int) in
-    let jac = jacobi (float_of_int deg) in
+    let jac = jacobi deg in
     let deigen_list =
         jac
         |> d_eigen (float_of_int deg -. 1.)
@@ -73,24 +71,22 @@ let polynomial_given_path deg path f0 f1 y0 n_t t_max =
         eigen_list =
         jac
         |> eigen (float_of_int deg -. 1.) in (*de_k/dX, e_k*)
-    let grid = range 0. du 1. n_int in
+    let grid = range 0. du n_int in
     let standardized_brownians = split_and_normalize_brownian path n_t h in
-    let rec aux accu ongoing_standardized_brownians k =
-        if k <= n_t then
-            match ongoing_standardized_brownians with
-                | current_path::other_paths ->
-                let w1 = current_path |> rev |> hd in
-                let basis_coefficients = basis (float_of_int deg -. 1.) n_int current_path ~w1:(w1) eigen_list in
+    let res = Array.make (n_t + 1) 0.0 in
+    let aux res =
+        res.(0) <- y0;
+        for i = 1 to n_t do
+            let current_path = standardized_brownians.(i-1) in
+            let w1 = current_path |> last in
+            let basis_coefficients = basis (float_of_int deg -. 1.) n_int current_path ~w1:(w1) eigen_list in
                 let dbrownian_pol_fun = fun t ->
-                    map2 (fun coeff deigen_fun -> coeff *. (deigen_fun t)) basis_coefficients deigen_list
-                    |> fold_left (+.) (w1) in
-                                       match accu with
-                                        | yk::_-> (*numerical scheme*)
-                                            let sum_integrand = fun pre u -> pre +. (sqrth) *. (f1 pre) *. (dbrownian_pol_fun u) *. du+. (f0 pre)*.ds in
-                                            let ykp1 = (fold_left sum_integrand yk grid) in
-                                        aux (ykp1::accu) other_paths (k+1)
-        else
-            rev accu
-    in aux [y0] standardized_brownians 1
+                    Array.map2 (fun coeff deigen_fun -> coeff *. (deigen_fun t)) basis_coefficients deigen_list
+                    |> Array.fold_left (+.) (w1) in
+            (* numerical scheme *)
+            let sum_integrand = fun pre u -> pre +. (sqrth) *. (f1 pre) *. (dbrownian_pol_fun u) *. du+. (f0 pre)*.ds in
+            res.(i) <- Array.fold_left sum_integrand res.(i-1) grid
+        done;
+    in let _ = aux res in
+    res
     ;;
-

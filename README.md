@@ -97,38 +97,40 @@ Please see `http://ocamlverse.net/content/optimizing_performance.html`
 ocamlopt -g -O3 utils.ml normal.ml brownian.ml polynomial.ml polynomialKarhunenLoeveBrownian.ml parabola_method.ml log_method.ml igbm.ml gbm.ml main.ml -o main
 perf record --call-graph=dwarf -- ./main
 perf report
-
-hyperfine './main 1000' './main 10000' './main 100000' './main 1000000'
 ```
-Running IGBM_Parabola.
-1000 points (Y_1, ..., Y_1000), with a Brownian motion sampled {1000, 10000, 100000, 1000000} times.
+
 
 ```
-hyperfine './main 1000' './main 10000' './main 100000' './main 1000000'
-Benchmark 1: ./main 1000
-  Time (mean ± σ):       1.9 ms ±   0.4 ms    [User: 1.6 ms, System: 1.9 ms]
-  Range (min … max):     1.4 ms …   4.9 ms    464 runs
+hyperfine './main 1000 10' './main 10000 100' './main 100000 100' './main 1000000 1000' './main 10000000 1000' './main 10000000 100' 
+Benchmark 1: ./main 1000 10
+  Time (mean ± σ):       6.3 ms ±   0.4 ms    [User: 4.6 ms, System: 2.0 ms]
+  Range (min … max):     5.7 ms …   8.2 ms    286 runs
  
-  Warning: Command took less than 5 ms to complete. Note that the results might be inaccurate because hyperfine can not calibrate the shell startup time much more precise than this limit. You can try to use the `-N`/`--shell=none` option to disable the shell completely.
-  Warning: Statistical outliers were detected. Consider re-running this benchmark on a quiet PC without any interferences from other programs. It might help to use the '--warmup' or '--prepare' options.
+Benchmark 2: ./main 10000 100
+  Time (mean ± σ):      43.4 ms ±   2.2 ms    [User: 40.5 ms, System: 2.7 ms]
+  Range (min … max):    40.6 ms …  51.8 ms    66 runs
  
-Benchmark 2: ./main 10000
-  Time (mean ± σ):      10.5 ms ±   1.3 ms    [User: 8.9 ms, System: 2.5 ms]
-  Range (min … max):     9.2 ms …  22.1 ms    189 runs
+Benchmark 3: ./main 100000 100
+  Time (mean ± σ):     399.5 ms ±   9.1 ms    [User: 392.5 ms, System: 4.4 ms]
+  Range (min … max):   386.4 ms … 416.2 ms    10 runs
  
-  Warning: Statistical outliers were detected. Consider re-running this benchmark on a quiet PC without any interferences from other programs. It might help to use the '--warmup' or '--prepare' options.
+Benchmark 4: ./main 1000000 1000
+  Time (mean ± σ):      3.954 s ±  0.062 s    [User: 3.909 s, System: 0.020 s]
+  Range (min … max):    3.843 s …  4.036 s    10 runs
  
-Benchmark 3: ./main 100000
-  Time (mean ± σ):     113.5 ms ±   2.0 ms    [User: 105.3 ms, System: 8.2 ms]
-  Range (min … max):   111.2 ms … 120.4 ms    25 runs
+Benchmark 5: ./main 10000000 1000
+  Time (mean ± σ):     41.077 s ±  2.743 s    [User: 40.583 s, System: 0.155 s]
+  Range (min … max):   38.234 s … 47.733 s    10 runs
  
-Benchmark 4: ./main 1000000
-  Time (mean ± σ):      3.207 s ±  0.044 s    [User: 3.123 s, System: 0.064 s]
-  Range (min … max):    3.162 s …  3.313 s    10 runs
+Benchmark 6: ./main 10000000 100
+  Time (mean ± σ):     48.495 s ±  5.526 s    [User: 47.326 s, System: 0.381 s]
+  Range (min … max):   42.192 s … 57.308 s    10 runs
  
 Summary
-  './main 1000' ran
-    5.60 ± 1.48 times faster than './main 10000'
-   60.33 ± 14.23 times faster than './main 100000'
- 1703.98 ± 401.46 times faster than './main 1000000'
-```
+  './main 1000 10' ran
+    6.85 ± 0.56 times faster than './main 10000 100'
+   62.98 ± 4.26 times faster than './main 100000 100'
+  623.31 ± 40.89 times faster than './main 1000000 1000'
+ 6475.67 ± 597.51 times faster than './main 10000000 1000'
+ 7645.08 ± 997.98 times faster than './main 10000000 100'
+``` 
