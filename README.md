@@ -103,7 +103,7 @@ $$
 # Compilation and performance profiling
 Please see `http://ocamlverse.net/content/optimizing_performance.html`
 ```
-ocamlopt -g -O3 utils.ml normal.ml brownian.ml polynomial.ml polynomialKarhunenLoeveBrownian.ml parabola_method.ml log_method.ml igbm.ml gbm.ml main.ml -o main
+ocamlopt -g -O3 utils.ml rand.ml polynomial.ml polynomialKarhunenLoeveBrownian.ml parabola_method.ml log_method.ml igbm.ml gbm.ml main.ml -o main
 perf record --call-graph=dwarf -- ./main
 perf report
 ```
