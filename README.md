@@ -53,7 +53,8 @@ $$z_{i+1} = z_i + \frac{h}{n}f_0(z_{i})+\frac{1}{n}f_1(z_{i})(W_{kh,(k+1)h}+(6-1
 
 In practice, we split our brownian motion and normalize each part, that is we consider the mapping
 
-$$W \mapsto ((h^{-1/2}(W_{kh+s}-W_{kh}))_{0\leq s\leq h})_{k}.$$
+$$W \mapsto ((h^{-1/2}(W_{kh+s}-W_{kh}))_{0\leq s\leq h})_{k}
+$$
 
 Then, we use the scaling property of brownian motion. We also use the following equality $H_{t_k,t_{k+1}} = \sqrt{\frac{h}{6}}I_1$.
 
@@ -143,3 +144,6 @@ Summary
  6475.67 ± 597.51 times faster than './main 10000000 1000'
  7645.08 ± 997.98 times faster than './main 10000000 100'
 ``` 
+
+# Reference
+Foster, JM. 2020. “Numerical Approximations for Stochastic Differential Equations.” PhD thesis, University of Oxford.
