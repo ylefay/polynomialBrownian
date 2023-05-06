@@ -27,7 +27,7 @@ The corresponding numerical scheme to obtain Y_{k+1} ~= y_{(k+1}h} from Y_k is
 
 z_0 = Y_k
 z_{i+1} = z_i + f_0(z_{i})ds + \sqrt{h}(f_1(z_{i}) W1+ + [f_1,f_0](z)h I_1/sqrt(6)
-    + [f_1,[f_1,f_0]](z)(1/10hI1^2+1/30 h^1.5))
+    + [f_1,[f_1,f_0]](z)(3/5h^1.5 I1^2+1/30 h^1.5))
 z_{n_int} = Y_{k+1}
 where ds = h/n_int.
 *)
@@ -50,11 +50,13 @@ let log_given_path path f0 f1 y0 n_t t_max =
             (* numerical scheme *)
             let sum_integrand = fun pre u ->
                 pre +. (f0 pre)*.ds +.
+                (
                 (sqrth) *.
                 (
                 (f1 pre) *. w1 +.
-                (lie_bracket_10 pre) *. h *. space_time_levy_area +.
-                (lie_bracket_110 pre) *. (0.6*.h*.space_time_levy_area*.space_time_levy_area +. 1./.30. *. h2)
+                (lie_bracket_10 pre) *. h *. space_time_levy_area
+                ) +.
+                (lie_bracket_110 pre) *. (0.6*.h2*.space_time_levy_area*.space_time_levy_area +. 1./.30.*.h2)
                 )*.du
             in
             res.(i) <- Array.fold_left sum_integrand res.(i-1) grid

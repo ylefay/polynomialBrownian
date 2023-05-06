@@ -38,6 +38,8 @@ let a = 0.1 and b = 0.04 and sigma=0.6 and y0 = 0.06;;
 let atilde = a +. 0.5*.sigma*.sigma and btilde = 2.*.a*.b/.(2.*.a+.sigma*.sigma);;
 let f0 yt = atilde*.(btilde-.yt) and f1 yt = sigma *. yt;;
 
+Printf.printf "\n log_integration_IGBM\n";;
+log_given_path mypath f0 f1 y0 n_int 1. |> iter pprint;;
 Printf.printf "\n polyparabola_integration_IGBM\n";;
 parabola_given_path mypath f0 f1 y0 n_int 1. |> iter pprint;;
 Printf.printf "\n poly1_integration_IGBM\n";;
