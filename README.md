@@ -30,7 +30,7 @@ $$\mathrm{d}y_t = f_0(y_t)\mathrm{d}t + f_1(y_t)\circ \mathrm{d}W_t.$$
 The corresponding Parabola-ODE (theorem 4.3.11) is
 
 $$
-\frac{\mathrm{d}z}{\mathrm{d}u} = f_0(z)h + f_1(z)(W_{t_k,t_{k+1}} + (6-12u)H_{t_k,t_{k+1}})
+\frac{\mathrm{d}z}{\mathrm{d}u} = f_0(z)h + f_1(z)(W_{t_k,t_{k+1}} + (12u-6)H_{t_k,t_{k+1}})
 $$
 
 This gives the following numerical scheme:
@@ -49,7 +49,7 @@ For each $k$, we define $z$ (we omit the dependency on $k$) by
 $$z_0 = Y_k.$$
 For each $0\leq i \leq n-1$,
 
-$$z_{i+1} = z_i + \frac{h}{n}f_0(z_{i})+\frac{1}{n}f_1(z_{i})(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h}).$$
+$$z_{i+1} = z_i + \frac{h}{n}f_0(z_{i})+\frac{1}{n}f_1(z_{i})(W_{kh,(k+1)h}+(12\frac{i}{n}-6)H_{kh,(k+1)h}).$$
 
 In practice, we split our brownian motion and normalize each part, that is we consider the mapping
 
