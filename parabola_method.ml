@@ -40,7 +40,7 @@ let parabola_given_path path f0 f1 y0 n_t t_max =
             let w1 = current_path |> last in
             let space_time_levy_area = space_time_levy_area_fun current_path (Some w1) in
             (* numerical scheme *)
-            let sum_integrand = fun pre u -> pre +. (sqrth) *. (f1 pre) *. (w1 +. (6. -. 12. *. u)*.space_time_levy_area)*.du +. (f0 pre)*.ds in
+            let sum_integrand = fun pre u -> pre +. (sqrth) *. (f1 pre) *. (w1 +. (12. *. u -. 6.)*.space_time_levy_area)*.du +. (f0 pre)*.ds in
             res.(i) <- Array.fold_left sum_integrand res.(i-1) grid
         done;
     in let _ = aux res in
