@@ -59,7 +59,7 @@ Then, we use the scaling property of brownian motion. We also use the following 
 
 # Polynomial-ODE method
 Same numerical scheme as the previous one but we replace 
-$$(W_{kh,(k+1)h}+(6-12\frac{i}{n})H_{kh,(k+1)h})$$ 
+$$(W_{kh,(k+1)h}+(12\frac{i}{n}-6)H_{kh,(k+1)h})$$ 
 
 by
 
