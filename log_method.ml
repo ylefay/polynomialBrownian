@@ -3,8 +3,8 @@ open Utils;;
 
 (*
 Lie bracket
-Let U, V : R -> R
-[U, V](f) := (UV - VU)(f) = (U(x)∂_x(V)(x) - V(x)∂_x(U)(x))∂_x(f)
+Let $U$, $V : \mathbb{R} \mapsto \mathbb{R}$
+$[U, V](f) := (UV - VU)(f) = (U(x)\partial_x(V)(x) - V(x)\partial_x(U)(x))\partial_x(f)$
 *)
 let lie dx u v =
   let overdx = 1. /. dx in
@@ -18,17 +18,17 @@ Log-ODE method for Stratovitch SDE:
 \mathrm{d}y_{t} = f_0(y_t)\mathrm{d}t+f_1(y_t)\circ\mathrm{d}W_t
 
 See theorem 4.3.8, the log-ODE method gives
-Y_{k+1} to be the solution at u=1 of the following ODE:
-\mathrm{d}z/\mathrm{d}u = f_0(z)h+f_1(z)W_{t_k,t_{k+1}} + [f_1,f_0](z)hH_{t_k,t_{k+1}} + [f_1,[f_1,f_0]](z)(3/5hH_{t_k,t_{k+1}}^2+1/30h^2)
-z_0 = Y_k
+$Y_{k+1}$ to be the solution at u=1 of the following ODE:
+\mathrm{d}z/\mathrm{d}u = f_0(z)h+f_1(z)W_{t_k,t_{k+1}} + [f_1,f_0](z)hH_{t_k,t_{k+1}} + [f_1,[f_1,f_0]](z)(3/5hH_{t_k,t_{k+1}}^2+1/30h^2),
+with initial condition: z_0 = Y_k.
 
-Let W be a standardized brownian motion, let h > 0, and n_int be the number of points we consider inside every intervals [kh,(k+1)h]
-The corresponding numerical scheme to obtain Y_{k+1} ~= y_{(k+1}h} from Y_k is
+Let $W$ be a standardized brownian motion, let $h > 0$, and n_int be the number of points we consider inside every intervals $[kh,(k+1)h]$
+The corresponding numerical scheme to obtain $Y_{k+1} \approx y_{(k+1}h}$, given $Y_k$ is the following one:
 
-z_0 = Y_k
-z_{i+1} = z_i + f_0(z_{i})ds + \sqrt{h}(f_1(z_{i}) W1+ + [f_1,f_0](z)h I_1/sqrt(6)
-    + [f_1,[f_1,f_0]](z)(3/5h^1.5 I1^2+1/30 h^1.5))
-z_{n_int} = Y_{k+1}
+z_0 = Y_k,
+z_{i+1} = z_i + f_0(z_{i})ds + \sqrt{h}(f_1(z_{i}) W1+ [f_1,f_0](z)h I_1/\sqrt{6}
+    + [f_1,[f_1,f_0]](z)(3/5h^1.5 I_1^2+1/30 h^1.5)),
+z_{n_int} = Y_{k+1},
 where ds = h/n_int.
 *)
 let log_given_path path f0 f1 y0 n_t t_max =

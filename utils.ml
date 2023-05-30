@@ -3,6 +3,7 @@ let last arr =
     arr.(Array.length arr - 1);;
 let first arr =
     arr.(0);;
+
 (*
 split arr in multiple subarr
 *)

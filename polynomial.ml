@@ -20,7 +20,7 @@ let rec produit p1 p2 =
         |> somme (produit p1p p2)
 
 (*
-Faster than built-in exponentiation
+Faster than built-in exponentiation.
 *)
 let rec puissance_opti_square x n = match n with
     | 0 -> 1.
@@ -67,7 +67,7 @@ let afficher p = match p with
 let afficher_bis p = afficher p ; print_newline ()
 ;;
 
-(* Polynomial derivation *)
+(* Polynomial derivative *)
 let rec derive p = match p with
     | ({coeff=an; deg=n})::p1p ->
         ({coeff=float_of_int n *. an; deg=n-1})::(derive p1p)

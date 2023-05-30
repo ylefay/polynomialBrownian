@@ -61,9 +61,9 @@ parabola_gbm_given_path mu sigma s0 mypath 252 252. |> iter pprint;;
 *)
 
 (*
-Different SDEs
+Different SDEs.
 Formula to convert from Ito drift to Strat. drift:
-a_strat = a_ito - 1/2b∂_x[b]
+a_strat = a_ito - 1/2b\partial_x(b)
 *)
 
 (*
@@ -75,6 +75,7 @@ Printf.printf "\n poly2_integration_CASE1\n";;
 polynomial_given_path 2 mypath (fun x -> 0.) (fun x -> x*.x) 1. n_int 1. |> iter pprint;;
 Printf.printf "\n log_integration_CASE1\n";;
 log_given_path mypath (fun x -> 0.) (fun x -> x*.x) 1. n_int 1. |> iter pprint;;
+
 (*
 Case 2:
 dy_t = y_t dt + y_t dW_t, y_0 = 1
@@ -85,9 +86,9 @@ Printf.printf "\n poly2_integration_CASE2\n";;
 polynomial_given_path 2 mypath (fun x -> 0.5*.x) (fun x -> x) 2. n_int 1. |> iter pprint;;
 Printf.printf "\n log_integration_CASE2\n";;
 log_given_path mypath (fun x -> 0.5*.x) (fun x -> x) 2. n_int 1. |> iter pprint;;
-
 Printf.printf "\n poly5_integration_CASE2\n";;
 polynomial_given_path 5 mypath (fun x -> 0.5*.x) (fun x -> x) 2. n_int 1. |> iter pprint;;
+
 (*
 Case 3:
 dy_t = sin(y_t)dW_t, y_0 = pi/2

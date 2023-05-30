@@ -7,13 +7,13 @@ open Parabola_method;;
 Parabola-ODE method for Inhomogeneous Brownian Motion
 \mathrm{d}y_{t} = a(b-y_t)\mathrm{d}t+\sigma y_t\mathrm{d}W_t
 
-Y_0 := y_0
-Y_{k+1} := e^{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}} (Y_k + ab\int_{t_k}^{t_{k+1}} e^{\tilde{a}(s-t_k)-\sigma \tilde{W}_{t_k,s}}\mathrm{d}s
+Y_0 := y_0,
+Y_{k+1} := e^{-\tilde{a}h+\sigma W_{t_k,t_{k+1}}} (Y_k + ab\int_{t_k}^{t_{k+1}} e^{\tilde{a}(s-t_k)-\sigma \tilde{W}_{t_k,s}}\mathrm{d}s.
 
-Return [Y_0, Y_h, Y_2h,...] where h = t_max / n_t
+Return [Y_0, Y_h, Y_{2h}, \ldots] where h = t_max / n_t.
 
 Generate on the fly the brownian motion, no memory overflow but not reproducible.
-Ues standardized brownian motion then scale it by sqrt h
+Ues standardized brownian motion then scale it.
 *)
 let parabola_igbm a b sigma y0 t_max n_t n_int =
     let tildea = a+.0.5*.sigma*.sigma and h = t_max /. float_of_int n_t in
@@ -59,8 +59,8 @@ let log_ode_igbm a b sigma y0 t_max n_t n_int =
     ;;
 
 (*
-reproducible (given path), can cause stack overflow
-slower than log_ode_igbm given equals n_int & n_t
+Construct the log-ODE solution given given a path, is reproducible, can cause stack overflow.
+Slower than log_ode_igbm given n_int == n_t.
 *)
 let log_ode_igbm_given_path a b sigma y0 path n_t t_max =
     let tildea = a+.0.5*.sigma*.sigma and n_int = Array.length path / n_t and h = t_max /. float_of_int n_t in
@@ -83,8 +83,8 @@ let log_ode_igbm_given_path a b sigma y0 path n_t t_max =
     ;;
 
 (*
-reproducible (given path), can cause memory overflow
-slower than parabola_igbm given equals n_int & n_t
+Construct the parabola-ODE solution given given a path, is reproducible, can cause stack overflow.
+Slower than log_ode_igbm given n_int == n_t.
 *)
 let parabola_igbm_given_path a b sigma y0 path n_t t_max =
     let tildea = a+.0.5*.sigma*.sigma in

@@ -1,6 +1,7 @@
 open Array;;
 open Utils;;
 let pi = Float.pi;;
+
 (*
 Box-Muller method
 *)

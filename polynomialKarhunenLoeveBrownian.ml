@@ -5,13 +5,12 @@ open Array;;
 
 
 (*
-Numerical approximations for stochastic differential equations, Foster
+Numerical approximations for stochastic differential equations, Foster 2020.
 *)
 
 (* Theorem 4.1.10 (A recurrence relation for constructing Jacobi-like polynomials)
 Assuming the product and the sum of two polynomials are done in O(1), we obtain
 the sequence of Jacobi polynomials of degree between 2 and n in O(n)
-
 *)
 let jacobi deg =
       let res = Array.make (deg - 1) [] in
@@ -40,7 +39,6 @@ let jacobi deg =
 (* Theorem 4.1.0, expression for e_k
 O(n)
 *)
-
 let eigen deg jacobi_list =
     let aux k pol_jac_kp1 =
         let jac_before_composition = (produit [{coeff=1./.k *. (sqrt (k*.(k+.1.)*.(2.*.k+.1.)) ); deg=0}] pol_jac_kp1) in
